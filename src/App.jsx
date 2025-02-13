@@ -8,6 +8,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminCRUD from './pages/AdminCRUD';
 import CreateScreen from './pages/CRUD/CreateScreen';
 import UpdateScreen from './pages/CRUD/UpdateScreen';
+import Res2 from './components/Res2/Res2';
+import Res3 from './components/Res3/Res3';
 function App() {
   const [count, setCount] = useState(0)
 
@@ -15,6 +17,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Res1 />} />
+        <Route path="/res2" element={<Res2 />} />
+        <Route path="/res3" element={<Res3 />} />
         <Route path="/admin" element={<AdminDashboard/>}/>
         <Route path="/admin/crud" element={<AdminCRUD/>}/>
         <Route path="/admin/crud/create" element={<CreateScreen/>}/>
