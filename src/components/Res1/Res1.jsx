@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import FlightBoard from "./FlightBoard";
-import sampleAds from "./Adobe_ad.gif";
+
 
 function Res1() {
     const [isAds, toggleAds] = useState(false);
