@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from './logo.png';
-import Res1 from '../components/Res1/Res1'; // Import Res1 component directly
+import Res1 from '../components/Res1/Res1';
+import Res2 from '../components/Res2/Res2';
+import Res3 from '../components/Res3/Res3';
 
 export default function AdminDashboard() {
     const [data, setData] = useState({ screens: [], ads: [], displayedAds: 0 });
@@ -28,8 +30,7 @@ export default function AdminDashboard() {
         fetchData();
     }, []);
 
-    // Calculate scaling based on screen count to fit 3 per row
-    const res1Scale = data.screens.length > 0 ? Math.min(1, 3 / data.screens.length) : 1;
+    const resComponents = [Res1, Res2, Res3];
 
     return (
         <div className="p-6">
@@ -64,15 +65,24 @@ export default function AdminDashboard() {
             </div>
 
             {/* Res1 Preview Section */}
-            <h2 className="mt-6 text-lg font-semibold">Res1 Preview</h2>
-            <div className="w-100 gap-4 mt-4">
-                {[...Array(Math.min(3, data.screens.length))].map((_, index) => (
-                    <div key={index} className="w-full border rounded-lg p-2 bg-white shadow-md flex justify-center items-center overflow-hidden h-64">
-                        <div className="relative h-full flex justify-center items-center" style={{ transform: 'scale(0.5) scale(1)', transformOrigin: 'center' }}>
-                            <Res1 />
+            <h2 className="mt-6 text-lg font-semibold">Screen Previews</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                {data.screens.map((screen, index) => {
+                    const ResComponent = resComponents[index % resComponents.length];
+                    return (
+                        <div key={index} className="w-full border rounded-lg p-2 bg-white shadow-md flex flex-col justify-center items-center overflow-hidden h-70">
+                            <div className="relative h-full flex justify-center items-center" style={{ transform: 'scale(0.3) scale(1)', transformOrigin: 'center' }}>
+                                <ResComponent />
+                            </div>
+                            <button
+                                className="-mt-5 text-center text-blue-500 underline"
+                                onClick={() => navigate(`../../Res${screen.id}`)}
+                            >
+                                {screen.name}
+                            </button>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Action Buttons */}
