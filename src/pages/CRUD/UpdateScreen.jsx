@@ -98,6 +98,21 @@ const UpdateScreen = () => {
               />
             </Grid>
           </Grid>
+          <Grid item xs={12} md={6}>
+  <TextField
+    fullWidth
+    label="Layout Type"
+    value={screen.layoutType || ""}
+    onChange={(e) => {
+      const newScreens = [...screens];
+      newScreens[screenIndex].layoutType = e.target.value;
+      setScreens(newScreens);
+    }}
+    variant="outlined"
+    className="mb-4"
+  />
+</Grid>
+
 
           <Typography variant="h6" component="h2" gutterBottom className="mt-4 font-semibold">
             Ads
