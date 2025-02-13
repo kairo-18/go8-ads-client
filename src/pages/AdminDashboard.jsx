@@ -68,15 +68,20 @@ export default function AdminDashboard() {
             <h2 className="mt-6 text-lg font-semibold">Screen Previews</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                 {data.screens.map((screen, index) => {
-                    const ResComponent = resComponents[index % resComponents.length];
                     return (
                         <div key={index} className="w-full border rounded-lg p-2 bg-white shadow-md flex flex-col justify-center items-center overflow-hidden h-70">
                             <div className="relative h-full flex justify-center items-center" style={{ transform: 'scale(0.3) scale(1)', transformOrigin: 'center' }}>
-                                <ResComponent />
+                                {screen.layoutType === 'Res1' ? (
+                                    <Res1 screenId={screen.id} />
+                                ) : screen.layoutType === 'Res2' ? (
+                                    <Res2 screenId={screen.id} />
+                                ) : screen.layoutType === 'Res3' ? (
+                                    <Res3 screenId={screen.id} />
+                                ) : null}
                             </div>
                             <button
                                 className="-mt-5 text-center text-blue-500 underline"
-                                onClick={() => navigate(`../../Res${screen.id}`)}
+                                onClick={() => navigate(`/${screen.routeName}`)}
                             >
                                 {screen.name}
                             </button>
