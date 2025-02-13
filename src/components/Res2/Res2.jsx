@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import FlightBoard from "../Res1/FlightBoard";
 import axios from "axios";
 
-function Res2() {
+function Res2({ screenId }) {
     const [isAds, toggleAds] = useState(false);
     const [ads, setAds] = useState([]);
     const [currentAdIndex, setCurrentAdIndex] = useState(0);
@@ -11,37 +11,25 @@ function Res2() {
     useEffect(() => {
         const fetchAds = async () => {
             try {
-                const response = await axios.get("http://localhost:3000/screens");
-                
-                // Find the screen with layoutType "Res2" and get its ads
-                const screen = response.data.find(screen => screen.layoutType === "Res2");
-                
-                // Extract the ads if the screen exists
-                const filteredAds = screen ? screen.ads : [];
-
-                console.log("Filtered Ads (Res2):", filteredAds);
-                setAds(filteredAds);
+                const response = await axios.get(`http://localhost:3000/screens/${screenId}`);
+                const screen = response.data;
+                setAds(screen.ads || []);
             } catch (error) {
                 console.error("Error fetching ads:", error);
             }
         };
-        
         fetchAds();
-    }, []);
+    }, [screenId]);
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            toggleAds((prev) => !prev);
-        }, 15000);
-        return () => clearInterval(interval);
-    }, []);
-
-    // Cycle through ads every 15 seconds
     useEffect(() => {
         if (ads.length > 0) {
             const interval = setInterval(() => {
-                setCurrentAdIndex((prevIndex) => (prevIndex + 2) % ads.length);
-            }, 15000);
+                toggleAds(false); // Hide ads
+                setTimeout(() => {
+                    setCurrentAdIndex((prevIndex) => (prevIndex + 2) % ads.length);
+                    toggleAds(true); // Show ads
+                }, 5000); // Wait for 5 seconds before showing the next ad
+            }, 10000); // Interval of 10 seconds (5 seconds for hiding + 5 seconds for showing)
             return () => clearInterval(interval);
         }
     }, [ads]);
@@ -49,9 +37,7 @@ function Res2() {
     return (
         <div className="w-screen h-screen flex overflow-hidden">
             {/* Flight detail board */}
-            <div
-                className={isAds ? "w-3/4 transition-all duration-500" : "w-full transition-all duration-500"}
-            >
+            <div className={isAds ? "w-3/4 transition-all duration-500" : "w-full transition-all duration-500"}>
                 <FlightBoard />
             </div>
 
