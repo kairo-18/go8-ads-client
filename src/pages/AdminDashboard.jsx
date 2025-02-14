@@ -8,6 +8,7 @@ import Res2 from '../components/Res2/Res2';
 import Res3 from '../components/Res3/Res3';
 import CreateScreen from "./CRUD/CreateScreen";
 import UpdateScreen from "./CRUD/UpdateScreen";
+import axiosInstance from '../axios/axiosInstance';
 
 export default function AdminDashboard() {
     const [data, setData] = useState({ screens: [], ads: [], displayedAds: 0 });
@@ -18,7 +19,7 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const screensResponse = await axios.get('http://localhost:3000/screens');
+                const screensResponse = await axiosInstance.get('http://localhost:3000/screens');
 
                 // Extract ads from screens since there's no direct GET /ads route
                 const allAds = screensResponse.data.flatMap(screen => screen.ads || []);

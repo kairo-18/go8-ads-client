@@ -19,6 +19,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
+import axiosInstance from "../../axios/axiosInstance";
 
 const modalStyle = {
     position: "absolute",
@@ -51,7 +52,7 @@ const UpdateScreen = ({ open, onClose }) => {
 
     const fetchScreens = async () => {
         try {
-            const response = await axios.get("http://localhost:3000/screens");
+            const response = await axiosInstance.get("http://localhost:3000/screens");
             setScreens(response.data);
         } catch (error) {
             console.error("Error fetching screens:", error);
@@ -60,7 +61,7 @@ const UpdateScreen = ({ open, onClose }) => {
 
     const handleUpdateScreen = async (screenId, updatedScreen) => {
         try {
-            await axios.patch(
+            await axiosInstance.patch(
                 `http://localhost:3000/screens/${screenId}`,
                 updatedScreen,
                 { headers: { "Content-Type": "application/json" } }
