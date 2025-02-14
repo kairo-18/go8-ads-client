@@ -10,6 +10,7 @@ import UpdateScreen from './pages/CRUD/UpdateScreen';
 import Res2 from './components/Res2/Res2';
 import Res3 from './components/Res3/Res3';
 import axios from 'axios';
+import CreateAnnouncement from './components/Announcement/CreateAnnouncement';
 
 
 function App() {
@@ -61,6 +62,7 @@ function App() {
         <Route path="/admin/crud" element={<AdminCRUD/>}/>
         <Route path="/admin/crud/create" element={<CreateScreen/>}/>
         <Route path="/admin/crud/update" element={<UpdateScreen/>}/>
+        <Route path="/admin/crud/createAnnouncement" element={<CreateAnnouncement/>}/>
       </Routes>
     </Router>
 
