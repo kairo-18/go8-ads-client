@@ -9,10 +9,20 @@ import CreateScreen from './pages/CRUD/CreateScreen';
 import UpdateScreen from './pages/CRUD/UpdateScreen';
 import Res2 from './components/Res2/Res2';
 import Res3 from './components/Res3/Res3';
-import axios from 'axios';
-import CreateAnnouncement from './components/Announcement/CreateAnnouncement';
 import axiosInstance from './axios/axiosInstance';
+import CreateAnnouncement from './components/Announcement/CreateAnnouncement';
 
+// PrivateRoute component to protect admin routes
+const PrivateRoute = ({ children }) => {
+  const token = localStorage.getItem('token'); // Or wherever the token is stored
+  
+  if (!token) {
+    // Redirect to login page if no token found
+    return <Navigate to="/admin" />;
+  }
+  
+  return children;
+};
 
 function App() {
   const [count, setCount] = useState(0)
@@ -40,34 +50,72 @@ function App() {
     fetchScreens();
   }, []); // Dependency array ensures it only runs once
   
-
-  
-  
   return (
     <Router>
       <Routes>
-      {screens.map((screen) => (
-        <Route
-          key={screen.id} // Ensure a unique key
-          path={screen.routeName}
+        {screens.map((screen) => (
+          <Route
+            key={screen.id}
+            path={screen.routeName}
+            element={
+              screen.layoutType === "Res1" ? <Res1 screenId={screen.id}/> :
+              screen.layoutType === "Res2" ? <Res2 screenId={screen.id}/> :
+              screen.layoutType === "Res3" ? <Res3 screenId={screen.id}/> :
+              <Navigate to="/" />
+            }
+          />
+        ))}
+
+        {/* Admin Routes with PrivateRoute wrapper */}
+        <Route path="/admin" element={<AdminLogin />} />
+        
+        <Route 
+          path="/admin/dashboard" 
           element={
-            screen.layoutType === "Res1" ? <Res1 screenId={screen.id}/> :
-            screen.layoutType === "Res2" ? <Res2 screenId={screen.id}/> :
-            screen.layoutType === "Res3" ? <Res3 screenId={screen.id}/> :
-            <Navigate to="/" />
+            <PrivateRoute>
+              <AdminDashboard />
+            </PrivateRoute>
           }
         />
-      ))}
-        <Route path="/admin" element={<AdminLogin/>}/>
-        <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
-        <Route path="/admin/crud" element={<AdminCRUD/>}/>
-        <Route path="/admin/crud/create" element={<CreateScreen/>}/>
-        <Route path="/admin/crud/update" element={<UpdateScreen/>}/>
-        <Route path="/admin/crud/createAnnouncement" element={<CreateAnnouncement/>}/>
+        
+        <Route 
+          path="/admin/crud" 
+          element={
+            <PrivateRoute>
+              <AdminCRUD />
+            </PrivateRoute>
+          }
+        />
+        
+        <Route 
+          path="/admin/crud/create" 
+          element={
+            <PrivateRoute>
+              <CreateScreen />
+            </PrivateRoute>
+          }
+        />
+        
+        <Route 
+          path="/admin/crud/update" 
+          element={
+            <PrivateRoute>
+              <UpdateScreen />
+            </PrivateRoute>
+          }
+        />
+        
+        <Route 
+          path="/admin/crud/createAnnouncement" 
+          element={
+            <PrivateRoute>
+              <CreateAnnouncement />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </Router>
-
   )
 }
 
-export default App
+export default App;

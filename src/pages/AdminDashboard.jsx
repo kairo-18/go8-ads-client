@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Button } from "@mui/material";
@@ -10,8 +10,10 @@ import CreateScreen from "./CRUD/CreateScreen";
 import axiosInstance from '../axios/axiosInstance';
 import CreateAnnouncementModal from "../components/Announcement/CreateAnnouncementModal";
 import UpdateScreen from "./CRUD/UpdateScreen";
+import { UserContext } from "../context/UserContext";
 
 export default function AdminDashboard() {
+    const { logout } = useContext(UserContext);  
     const [data, setData] = useState({ screens: [], ads: [], displayedAds: 0 });
     const navigate = useNavigate();
     const [openCreateModal, setOpenCreateModal] = useState(false);
@@ -37,7 +39,7 @@ export default function AdminDashboard() {
             }
         };
         fetchData();
-    }); // Add data as a dependency
+    }, []); // Add data as a dependency
 
     return (
         <div className="p-6 bg-[#f9f3f2]">
@@ -47,8 +49,8 @@ export default function AdminDashboard() {
                 <button
                     className="bg-red-500 text-white px-4 py-2 rounded-lg"
                     onClick={() => {
-                        // Add your logout logic here
-                        navigate("/admin");
+                        logout();  // Call logout function
+                        navigate("/admin");  // Redirect to login page
                     }}
                 >
                     Logout
