@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import  axios from 'axios';
+import { Button } from "@mui/material";
 import logo from './logo.png';
 import Res1 from '../components/Res1/Res1';
 import Res2 from '../components/Res2/Res2';
 import Res3 from '../components/Res3/Res3';
+import CreateScreen from "./CRUD/CreateScreen";
+import UpdateScreen from "./CRUD/UpdateScreen";
 
 export default function AdminDashboard() {
     const [data, setData] = useState({ screens: [], ads: [], displayedAds: 0 });
     const navigate = useNavigate();
+    const [openCreateModal, setOpenCreateModal] = useState(false);
+    const [openUpdateModal, setOpenUpdateModal] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -28,12 +33,10 @@ export default function AdminDashboard() {
             }
         };
         fetchData();
-    }, []);
-
-    const resComponents = [Res1, Res2, Res3];
+    }, [data]); // Add data as a dependency
 
     return (
-        <div className="p-6">
+        <div className="p-6 bg-[#f9f3f2]">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold">Dashboard</h1>
                 <img src={logo} alt="AdSpace Logo" className="w-32 mx-auto" />
@@ -66,10 +69,10 @@ export default function AdminDashboard() {
 
             {/* Res1 Preview Section */}
             <h2 className="mt-6 text-lg font-semibold">Screen Previews</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4 ">
                 {data.screens.map((screen, index) => {
                     return (
-                        <div key={index} className="w-full border rounded-lg p-2 bg-white shadow-md flex flex-col justify-center items-center overflow-hidden h-70">
+                        <div key={index} className="w-full border rounded-lg p-2 bg-[#f9f6f5] shadow-md flex flex-col justify-center items-center overflow-hidden h-70 ">
                             <div className="relative h-full flex justify-center items-center" style={{ transform: 'scale(0.3) scale(1)', transformOrigin: 'center' }}>
                                 {screen.layoutType === 'Res1' ? (
                                     <Res1 screenId={screen.id} />
@@ -92,19 +95,30 @@ export default function AdminDashboard() {
 
             {/* Action Buttons */}
             <div className="flex gap-4 mt-6">
-                <button
-                    className="bg-red-500 text-white px-6 py-2 rounded-lg w-full"
-                    onClick={() => navigate('/admin/crud/create')}
+                <Button
+                    variant="contained"
+                    sx={{ backgroundColor: 'green', '&:hover': { backgroundColor: 'darkgreen' } }}
+                    className="text-white px-6 py-2 rounded-lg w-full"
+                    onClick={() => setOpenCreateModal(true)}
                 >
                     Create Ad
-                </button>
-                <button
-                    className={`text-white px-6 py-2 rounded-lg w-full ${data.ads.length > 0 ? 'bg-yellow-500' : 'bg-gray-400 cursor-not-allowed'}`}
-                    onClick={() => data.ads.length > 0 ? navigate('/admin/crud/update') : alert('No ads found')}
-                    disabled={data.ads.length === 0}
+                </Button>
+                <CreateScreen open={openCreateModal} onClose={() => setOpenCreateModal(false)} />
+
+                <Button
+                    variant="contained"
+                    sx={{ backgroundColor: data.ads.length > 0 ? 'blue' : 'gray', '&:hover': { backgroundColor: data.ads.length > 0 ? 'darkblue' : 'gray' } }}
+                    className={`text-white px-6 py-2 rounded-lg w-full ${data.ads.length > 0 ? '' : 'cursor-not-allowed'}`}
+                    onClick={() => data.ads.length > 0 ? setOpenUpdateModal(true) : alert('No ads found')}
                 >
-                    {data.ads.length > 0 ? 'Update Ad' : 'No ads found'}
-                </button>
+                    Update Screens
+                </Button>
+
+                {/* Update Modal */}
+                <UpdateScreen
+                    open={openUpdateModal}
+                    onClose={() => setOpenUpdateModal(false)}
+                />
             </div>
         </div>
     );
