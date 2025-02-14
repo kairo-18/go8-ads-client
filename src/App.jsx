@@ -11,6 +11,7 @@ import Res2 from './components/Res2/Res2';
 import Res3 from './components/Res3/Res3';
 import axios from 'axios';
 import CreateAnnouncement from './components/Announcement/CreateAnnouncement';
+import axiosInstance from './axios/axiosInstance';
 
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
   useEffect(() => {
     const fetchScreens = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/screens");
+        const response = await axiosInstance.get("http://localhost:3000/screens");
   
         setScreens((prevScreens) => {
           const newScreens = response.data;

@@ -3,8 +3,12 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { TextField, Button, Card } from "@mui/material";
 import logo from "./logo.png";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext"; // Import UserContext
+import axiosInstance from "../axios/axiosInstance";
 
 const AdminLogin = () => {
+  const { login } = useContext(UserContext); // Access login function from context
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -17,6 +21,17 @@ const AdminLogin = () => {
         password,
       });
       console.log("Login successful", response.data);
+      
+        // On successful login, the backend will return the token
+        const token = response.data.access_token;
+
+        // Store the token in localStorage for future requests
+        localStorage.setItem("token", token);
+  
+        // Automatically set the Authorization header using the axios instance
+        axiosInstance.defaults.headers["Authorization"] = `Bearer ${token}`;
+
+      // Navigate to dashboard
       navigate("/admin/dashboard");
     } catch (err) {
       setError("Invalid username or password");
@@ -41,7 +56,7 @@ const AdminLogin = () => {
         className="p-8 shadow-md rounded-md border border-gray-400 w-11/12 sm:w-96"
         sx={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
       >
-        <h2 className="text- text-lg font-semibold mb-4">Log in</h2>
+        <h2 className="text-lg font-semibold mb-4">Log in</h2>
         {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
         <TextField
           fullWidth

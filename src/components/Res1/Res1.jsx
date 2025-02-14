@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import FlightBoard from "./FlightBoard";
 import AnnouncementScreen from "../Announcement/AnnouncementScreen";
 import axios from "axios";
+import axiosInstance from "../../axios/axiosInstance";
 
 function Res1({ screenId }) {
     const [isAds, toggleAds] = useState(true);
@@ -58,7 +59,7 @@ function Res1({ screenId }) {
     useEffect(() => {
         const fetchAds = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/screens/${screenId}`);
+                const response = await axiosInstance.get(`http://localhost:3000/screens/${screenId}`);
                 setAds(response.data.ads || []);
             } catch (error) {
                 console.error("Error fetching ads:", error);
