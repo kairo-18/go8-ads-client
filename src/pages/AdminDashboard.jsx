@@ -9,6 +9,7 @@ import Res3 from "../components/Res3/Res3";
 import CreateScreen from "./CRUD/CreateScreen";
 import axiosInstance from '../axios/axiosInstance';
 import CreateAnnouncementModal from "../components/Announcement/CreateAnnouncementModal";
+import UpdateScreen from "./CRUD/UpdateScreen";
 
 export default function AdminDashboard() {
     const [data, setData] = useState({ screens: [], ads: [], displayedAds: 0 });
@@ -21,7 +22,7 @@ export default function AdminDashboard() {
         const fetchData = async () => {
             try {
                 const screensResponse = await axiosInstance.get('http://localhost:3000/screens');
-                const screensResponse = await axios.get("http://localhost:3000/screens");
+                
 
                 // Extract ads from screens since there's no direct GET /ads route
                 const allAds = screensResponse.data.flatMap((screen) => screen.ads || []);
@@ -36,7 +37,7 @@ export default function AdminDashboard() {
             }
         };
         fetchData();
-    }, [data]); // Add data as a dependency
+    }); // Add data as a dependency
 
     return (
         <div className="p-6 bg-[#f9f3f2]">

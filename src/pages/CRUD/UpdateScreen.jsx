@@ -52,7 +52,7 @@ const UpdateScreen = ({ open, onClose }) => {
 
   const fetchScreens = async () => {
       try {
-          const response = await axios.get("http://localhost:3000/screens");
+          const response = await axiosInstance.get("http://localhost:3000/screens");
           setScreens(response.data);
       } catch (error) {
           console.error("Error fetching screens:", error);
@@ -61,7 +61,7 @@ const UpdateScreen = ({ open, onClose }) => {
 
   const handleUpdateScreen = async (screenId, updatedScreen) => {
       try {
-          await axios.patch(
+          await axiosInstance.patch(
               `http://localhost:3000/screens/${screenId}`,
               updatedScreen,
               {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import axiosInstance from "../../axios/axiosInstance";
 
 function AnnouncementScreen({ onComplete }) {
   const [announcements, setAnnouncements] = useState([]);
@@ -10,7 +11,7 @@ function AnnouncementScreen({ onComplete }) {
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/announcements");
+        const response = await axiosInstance.get("http://localhost:3000/announcements");
         console.log("📡 Fetched Announcements:", response.data); // Debug log
         setAnnouncements(response.data || []);
       } catch (error) {

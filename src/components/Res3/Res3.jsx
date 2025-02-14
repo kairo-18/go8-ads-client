@@ -42,7 +42,7 @@ function Res3({ screenId }) {
                         console.error("Error deactivating announcement:", error);
                     }
 
-                    setAnnouncementIndex((prevIndex) => 
+                    setAnnouncementIndex((prevIndex) =>
                         prevIndex + 1 < announcements.length ? prevIndex + 1 : 0
                     );
                     setCurrentAnnouncement(null);
@@ -84,6 +84,7 @@ function Res3({ screenId }) {
     return (
         <div className="w-screen h-screen flex flex-col">
             <div className="flex flex-1 overflow-hidden">
+                {/* Left Ad Section */}
                 <AnimatePresence>
                     {isAds && ads[currentAdIndex] && (
                         <motion.div
@@ -93,15 +94,43 @@ function Res3({ screenId }) {
                             transition={{ duration: 0.5 }}
                             className="w-1/4 bg-black flex items-center justify-center"
                         >
-                            <img className="w-full h-full object-cover" src={ads[currentAdIndex].mediaUrl} alt="Ad" />
+                            {ads[currentAdIndex].mediaUrl.match(/\.(jpeg|jpg|png|gif)$/) ? (
+                                <img className="w-full h-full object-cover" src={ads[currentAdIndex].mediaUrl} alt="Ad" />
+                            ) : ads[currentAdIndex].mediaUrl.match(/\.(mp4|webm|ogg)$/) ? (
+                                <video className="w-full h-full object-cover" src={ads[currentAdIndex].mediaUrl} autoPlay loop muted />
+                            ) : (
+                                <p className="text-white">No valid ads available</p>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
 
+                {/* Flight Detail Board */}
                 <div className="flex-1">
                     <FlightBoard />
                 </div>
             </div>
+
+            {/* Bottom Ad Section */}
+            <AnimatePresence>
+                {isAds && ads[currentAdIndex + 1] && (
+                    <motion.div
+                        initial={{ y: "100%" }}
+                        animate={{ y: 0 }}
+                        exit={{ y: "100%" }}
+                        transition={{ duration: 0.5 }}
+                        className="w-full h-1/4 bg-black flex items-center justify-center"
+                    >
+                        {ads[currentAdIndex + 1].mediaUrl.match(/\.(jpeg|jpg|png|gif)$/) ? (
+                            <img className="w-full h-full object-cover" src={ads[currentAdIndex + 1].mediaUrl} alt="Ad" />
+                        ) : ads[currentAdIndex + 1].mediaUrl.match(/\.(mp4|webm|ogg)$/) ? (
+                            <video className="w-full h-full object-cover" src={ads[currentAdIndex + 1].mediaUrl} autoPlay loop muted />
+                        ) : (
+                            <p className="text-white">No valid ads available</p>
+                        )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
