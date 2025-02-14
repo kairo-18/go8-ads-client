@@ -1,27 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import  axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { Button } from "@mui/material";
-import logo from './logo.png';
-import Res1 from '../components/Res1/Res1';
-import Res2 from '../components/Res2/Res2';
-import Res3 from '../components/Res3/Res3';
+import logo from "./logo.png";
+import Res1 from "../components/Res1/Res1";
+import Res2 from "../components/Res2/Res2";
+import Res3 from "../components/Res3/Res3";
 import CreateScreen from "./CRUD/CreateScreen";
 import UpdateScreen from "./CRUD/UpdateScreen";
+import CreateAnnouncementModal from "../components/Announcement/CreateAnnouncementModal";
 
 export default function AdminDashboard() {
     const [data, setData] = useState({ screens: [], ads: [], displayedAds: 0 });
     const navigate = useNavigate();
     const [openCreateModal, setOpenCreateModal] = useState(false);
     const [openUpdateModal, setOpenUpdateModal] = useState(false);
+    const [openAnnouncementModal, setOpenAnnouncementModal] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const screensResponse = await axios.get('http://localhost:3000/screens');
+                const screensResponse = await axios.get("http://localhost:3000/screens");
 
                 // Extract ads from screens since there's no direct GET /ads route
-                const allAds = screensResponse.data.flatMap(screen => screen.ads || []);
+                const allAds = screensResponse.data.flatMap((screen) => screen.ads || []);
 
                 setData({
                     screens: screensResponse.data,
@@ -29,7 +31,7 @@ export default function AdminDashboard() {
                     displayedAds: allAds.reduce((acc, ad) => acc + (ad.displayCount || 0), 0),
                 });
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error("Error fetching data:", error);
             }
         };
         fetchData();
@@ -44,7 +46,7 @@ export default function AdminDashboard() {
                     className="bg-red-500 text-white px-4 py-2 rounded-lg"
                     onClick={() => {
                         // Add your logout logic here
-                        navigate('/admin');
+                        navigate("/admin");
                     }}
                 >
                     Logout
@@ -72,13 +74,22 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4 ">
                 {data.screens.map((screen, index) => {
                     return (
-                        <div key={index} className="w-full border rounded-lg p-2 bg-[#f9f6f5] shadow-md flex flex-col justify-center items-center overflow-hidden h-70 ">
-                            <div className="relative h-full flex justify-center items-center" style={{ transform: 'scale(0.3) scale(1)', transformOrigin: 'center' }}>
-                                {screen.layoutType === 'Res1' ? (
+                        <div
+                            key={index}
+                            className="w-full border rounded-lg p-2 bg-[#f9f6f5] shadow-md flex flex-col justify-center items-center overflow-hidden h-70 "
+                        >
+                            <div
+                                className="relative h-full flex justify-center items-center"
+                                style={{
+                                    transform: "scale(0.3) scale(1)",
+                                    transformOrigin: "center",
+                                }}
+                            >
+                                {screen.layoutType === "Res1" ? (
                                     <Res1 screenId={screen.id} />
-                                ) : screen.layoutType === 'Res2' ? (
+                                ) : screen.layoutType === "Res2" ? (
                                     <Res2 screenId={screen.id} />
-                                ) : screen.layoutType === 'Res3' ? (
+                                ) : screen.layoutType === "Res3" ? (
                                     <Res3 screenId={screen.id} />
                                 ) : null}
                             </div>
@@ -97,19 +108,33 @@ export default function AdminDashboard() {
             <div className="flex gap-4 mt-6">
                 <Button
                     variant="contained"
-                    sx={{ backgroundColor: 'green', '&:hover': { backgroundColor: 'darkgreen' } }}
+                    sx={{
+                        backgroundColor: "green",
+                        "&:hover": { backgroundColor: "darkgreen" },
+                    }}
                     className="text-white px-6 py-2 rounded-lg w-full"
                     onClick={() => setOpenCreateModal(true)}
                 >
                     Create Ad
                 </Button>
-                <CreateScreen open={openCreateModal} onClose={() => setOpenCreateModal(false)} />
+                <CreateScreen
+                    open={openCreateModal}
+                    onClose={() => setOpenCreateModal(false)}
+                />
 
                 <Button
                     variant="contained"
-                    sx={{ backgroundColor: data.ads.length > 0 ? 'blue' : 'gray', '&:hover': { backgroundColor: data.ads.length > 0 ? 'darkblue' : 'gray' } }}
-                    className={`text-white px-6 py-2 rounded-lg w-full ${data.ads.length > 0 ? '' : 'cursor-not-allowed'}`}
-                    onClick={() => data.ads.length > 0 ? setOpenUpdateModal(true) : alert('No ads found')}
+                    sx={{
+                        backgroundColor: data.ads.length > 0 ? "blue" : "gray",
+                        "&:hover": {
+                            backgroundColor:
+                                data.ads.length > 0 ? "darkblue" : "gray",
+                        },
+                    }}
+                    className={`text-white px-6 py-2 rounded-lg w-full ${
+                        "cursor-not-allowed"
+                    }`}
+                    onClick={() => setOpenUpdateModal(true)}
                 >
                     Update Screens
                 </Button>
@@ -118,6 +143,29 @@ export default function AdminDashboard() {
                 <UpdateScreen
                     open={openUpdateModal}
                     onClose={() => setOpenUpdateModal(false)}
+                />
+
+                <Button
+                    variant="contained"
+                    sx={{
+                        backgroundColor: data.ads.length > 0 ? "blue" : "gray",
+                        "&:hover": {
+                            backgroundColor:
+                                data.ads.length > 0 ? "darkblue" : "gray",
+                        },
+                    }}
+                    className={`text-white px-6 py-2 rounded-lg w-full ${
+                        data.ads.length > 0 ? "" : "cursor-not-allowed"
+                    }`}
+                    onClick={() => setOpenAnnouncementModal(true)}
+                >
+                    Create Announcement
+                </Button>
+
+                {/* Create Announcement Modal */}
+                <CreateAnnouncementModal
+                    open={openAnnouncementModal}
+                    onClose={() => setOpenAnnouncementModal(false)}
                 />
             </div>
         </div>
