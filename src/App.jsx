@@ -17,6 +17,7 @@ import AdminPreviews from './pages/Admin/AdminPreviews';
 import AdSettings from './pages/Admin/AdSettings';
 import Scheduling from './pages/Admin/Scheduling';
 import socket from './socket-config/socket'; // Import the socket instance
+import CreateAd from './pages/Admin/CreateAd';
 
 // PrivateRoute component to protect admin routes
 const PrivateRoute = ({ children }) => {
@@ -155,6 +156,14 @@ function App() {
           element={
             <PrivateRoute>
               <AdSettings />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path='/admin/ad-setting/create-ad' 
+          element={
+            <PrivateRoute>
+              <CreateAd />
             </PrivateRoute>
           } 
         />

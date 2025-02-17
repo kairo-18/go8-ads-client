@@ -209,6 +209,29 @@ const UpdateScreen = ({ open, onClose }) => {
                           }}
                           variant="outlined"
                         />
+                        <TextField
+                          fullWidth
+                          label="Slot"
+                          value={ad.slot || ""}
+                          onChange={(e) => {
+                              const newScreens = [...screens];
+                              newScreens[screenIndex].ads[adIndex].slot = e.target.value;
+                              setScreens(newScreens);
+                          }}
+                          variant="outlined"
+                        />
+                        <TextField
+                          fullWidth
+                          label="Duration"
+                          type="number"
+                          value={ad.duration || ""}
+                          onChange={(e) => {
+                              const newScreens = [...screens];
+                              newScreens[screenIndex].ads[adIndex].duration = e.target.value;
+                              setScreens(newScreens);
+                          }}
+                          variant="outlined"
+                        />
                         <Button
                           variant="contained"
                           component="label"
