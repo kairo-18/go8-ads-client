@@ -16,57 +16,45 @@ function Res3({ screenId }) {
     const [currentAnnouncement, setCurrentAnnouncement] = useState(null);
     const [announcementIndex, setAnnouncementIndex] = useState(0);
 
-    useEffect(() => {
-        // Fetch announcements from the server
-        const fetchAnnouncements = async () => {
-            try {
-                const response = await axios.get("http://localhost:3000/announcements");
-                setAnnouncements(response.data || []);
-            } catch (error) {
-                console.error("Error fetching announcements:", error);
-            }
-        };
+     // Fetching announcements and listening for new ones via WebSocket
+  useEffect(() => {
+    // Listen for announcements specific to this screen
+    socket.on(`announcementToScreen-${screenId}`, (newAnnouncement) => {
+      console.log("New announcement received for screen:", newAnnouncement);
+      setAnnouncements((prev) => [...prev, newAnnouncement]); // Add new announcement to the list
+    });
 
-        fetchAnnouncements();
-        const interval = setInterval(fetchAnnouncements, 5000); // Fetch new announcements every 5 seconds
-        return () => clearInterval(interval);
-    }, []);
+    // Clean up WebSocket listener when the component unmounts
+    return () => {
+      socket.off(`announcementToScreen-${screenId}`);
+    };
+  }, [screenId]); // Ensure the socket listens to the correct screenId
 
-    // Listen for new announcements via WebSocket
-    useEffect(() => {
-        socket.on("newAnnouncement", (newAnnouncement) => {
-            console.log("New announcement received:", newAnnouncement);
-            setAnnouncements((prev) => [...prev, newAnnouncement]); // Add new announcement to the list
-        });
+  // Deactivate the current announcement after its duration
+  useEffect(() => {
+    if (announcements.length > 0 && !currentAnnouncement) {
+      const nextAnnouncement = announcements[announcementIndex];
 
-        return () => {
-            socket.off("newAnnouncement"); // Clean up listener on component unmount
-        };
-    }, []);
+      if (nextAnnouncement) {
+        setCurrentAnnouncement(nextAnnouncement);
 
-    useEffect(() => {
-        if (announcements.length > 0 && !currentAnnouncement) {
-            const nextAnnouncement = announcements[announcementIndex];
+        setTimeout(async () => {
+          try {
+            // Deactivate after the specified duration
+            await axios.patch(`http://localhost:3000/announcements/${nextAnnouncement.id}/deactivate`);
+            console.log(`✅ Announcement ${nextAnnouncement.id} set to inactive`);
+          } catch (error) {
+            console.error("Error deactivating announcement:", error);
+          }
 
-            if (nextAnnouncement) {
-                setCurrentAnnouncement(nextAnnouncement);
-
-                setTimeout(async () => {
-                    try {
-                        await axios.patch(`http://localhost:3000/announcements/${nextAnnouncement.id}/deactivate`);
-                        console.log(`✅ Announcement ${nextAnnouncement.id} set to inactive`);
-                    } catch (error) {
-                        console.error("Error deactivating announcement:", error);
-                    }
-
-                    setAnnouncementIndex((prevIndex) =>
-                        prevIndex + 1 < announcements.length ? prevIndex + 1 : 0
-                    );
-                    setCurrentAnnouncement(null);
-                }, nextAnnouncement.duration * 1000);
-            }
-        }
-    }, [announcementIndex, announcements]);
+          setAnnouncementIndex((prevIndex) =>
+            prevIndex + 1 < announcements.length ? prevIndex + 1 : 0
+          );
+          setCurrentAnnouncement(null);
+        }, nextAnnouncement.duration * 1000); // Duration in seconds (converted to ms)
+      }
+    }
+  }, [announcementIndex, announcements]);
 
     useEffect(() => {
         const fetchAds = async () => {
