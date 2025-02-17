@@ -1,81 +1,33 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect, useRef } from "react";
 import FlightBoard from "../Res1/FlightBoard";
 import AnnouncementScreen from "../Announcement/AnnouncementScreen";
-import axios from "axios";
-import io from "socket.io-client";
-
-// Assuming your server is running at localhost:3000
-const socket = io("http://localhost:3000"); // Connect to your WebSocket server
+import socket from "../../socket-config/socket"; // Import socket instance from socket.js
+import axiosInstance from "../../axios/axiosInstance";
+import { motion, AnimatePresence } from "framer-motion";
 
 function Res2({ screenId }) {
   const [isAds, toggleAds] = useState(false);
   const [ads, setAds] = useState([]);
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
-  const [announcements, setAnnouncements] = useState([]);
-  const [currentAnnouncement, setCurrentAnnouncement] = useState(null);
-  const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const [announcement, setAnnouncement] = useState(null);
 
-  // Join the screen when the component mounts
+  // Fetch announcements and listen for new ones via WebSocket
   useEffect(() => {
-    // Emit the joinScreen event with the screenId
-    if (screenId) {
-      socket.emit('joinScreen', screenId);
-      console.log(`Joined screen with ID: ${screenId}`);
-    }
-
-    // Clean up when the component unmounts
-    return () => {
-      socket.emit('leaveScreen', screenId);
-      console.log(`Left screen with ID: ${screenId}`);
-    };
-  }, [screenId]);
-
-  // Fetching announcements and listening for new ones via WebSocket
-  useEffect(() => {
-    // Listen for announcements specific to this screen
     socket.on(`announcementToScreen-${screenId}`, (newAnnouncement) => {
       console.log("New announcement received for screen:", newAnnouncement);
-      setAnnouncements((prev) => [...prev, newAnnouncement]); // Add new announcement to the list
+      setAnnouncement(newAnnouncement); // Always set the latest announcement
     });
 
-    // Clean up WebSocket listener when the component unmounts
     return () => {
       socket.off(`announcementToScreen-${screenId}`);
     };
-  }, [screenId]); // Ensure the socket listens to the correct screenId
+  }, [screenId]);
 
-  // Deactivate the current announcement after its duration
-  useEffect(() => {
-    if (announcements.length > 0 && !currentAnnouncement) {
-      const nextAnnouncement = announcements[announcementIndex];
-
-      if (nextAnnouncement) {
-        setCurrentAnnouncement(nextAnnouncement);
-
-        setTimeout(async () => {
-          try {
-            // Deactivate after the specified duration
-            await axios.patch(`http://localhost:3000/announcements/${nextAnnouncement.id}/deactivate`);
-            console.log(`✅ Announcement ${nextAnnouncement.id} set to inactive`);
-          } catch (error) {
-            console.error("Error deactivating announcement:", error);
-          }
-
-          setAnnouncementIndex((prevIndex) =>
-            prevIndex + 1 < announcements.length ? prevIndex + 1 : 0
-          );
-          setCurrentAnnouncement(null);
-        }, nextAnnouncement.duration * 1000); // Duration in seconds (converted to ms)
-      }
-    }
-  }, [announcementIndex, announcements]);
-
-  // Fetching ads for the current screenId
+  // Fetch ads for the current screenId
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/screens/${screenId}`);
+        const response = await axiosInstance.get(`http://localhost:3000/screens/${screenId}`);
         setAds(response.data.ads || []);
       } catch (error) {
         console.error("Error fetching ads:", error);
@@ -94,14 +46,14 @@ function Res2({ screenId }) {
           setCurrentAdIndex((prevIndex) => (prevIndex + 2) % ads.length);
           toggleAds(true);
         }, 5000);
-      }, 10000); // Change ad every 10 seconds
+      }, 10000);
       return () => clearInterval(interval);
     }
   }, [ads]);
 
-  // If there is a current announcement, display it
-  if (currentAnnouncement) {
-    return <AnnouncementScreen announcement={currentAnnouncement} />;
+  // If there is an announcement, display it
+  if (announcement) {
+    return <AnnouncementScreen announcement={announcement} onComplete={() => setAnnouncement(null)} />;
   }
 
   return (
