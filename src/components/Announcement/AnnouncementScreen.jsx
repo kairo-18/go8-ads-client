@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; 
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
 import axiosInstance from "../../axios/axiosInstance";
+import socket from "../../socket-config/socket";
 
 function AnnouncementScreen({ onComplete }) {
   const [announcements, setAnnouncements] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Fetch Announcements from API
+  // Fetch Announcements from API (initial fetch)
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
         const response = await axiosInstance.get("http://localhost:3000/announcements");
-        console.log("📡 Fetched Announcements:", response.data); // Debug log
+        console.log("Fetched Announcements:", response.data);  // Log fetched data for debugging
         setAnnouncements(response.data || []);
       } catch (error) {
         console.error("❌ Error fetching announcements:", error);
@@ -20,6 +20,19 @@ function AnnouncementScreen({ onComplete }) {
     };
 
     fetchAnnouncements();
+  }, []);
+
+  // Listen for real-time updates via WebSocket
+  useEffect(() => {
+    socket.on("announcementsUpdated", (newAnnouncements) => {
+      console.log("📡 New announcements received:", newAnnouncements);  // Log received WebSocket data
+      setAnnouncements(newAnnouncements); // Update state with the new announcements
+    });
+
+    // Cleanup listener on component unmount
+    return () => {
+      socket.off("announcementsUpdated");
+    };
   }, []);
 
   // Cycle through announcements
@@ -31,7 +44,7 @@ function AnnouncementScreen({ onComplete }) {
         console.log("🚀 Showing Announcement:", displayedAnnouncement);
 
         try {
-          await axios.patch(
+          await axiosInstance.patch(
             `http://localhost:3000/announcements/${displayedAnnouncement.id}/deactivate`
           );
           console.log(`✅ Announcement ${displayedAnnouncement.id} set to inactive`);
@@ -53,14 +66,13 @@ function AnnouncementScreen({ onComplete }) {
     }
   }, [currentIndex, announcements, onComplete]);
 
-  // Display message if no announcements are available
-  if (announcements.length === 0) {
-    return (
-      <div className="w-screen h-screen flex items-center justify-center bg-blue-900 text-yellow-300">
-        <h1 className="text-5xl">No Announcements Available</h1>
-      </div>
-    );
-  }
+  // If no announcements, go back to previous screen
+  useEffect(() => {
+    if (announcements.length === 0) {
+      console.log("🎬 No announcements. Returning to previous screen.");
+      onComplete?.(); // Call onComplete to go back to the previous screen
+    }
+  }, [announcements, onComplete]);
 
   return (
     <AnimatePresence mode="wait">
