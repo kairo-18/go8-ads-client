@@ -34,7 +34,6 @@ const PrivateRoute = ({ children }) => {
 function App() {
   const [count, setCount] = useState(0);
   const [screens, setScreens] = useState([]);
-  const [isSocketConnected, setIsSocketConnected] = useState(false);
 
   useEffect(() => {
     const fetchScreens = async () => {
@@ -53,31 +52,6 @@ function App() {
     };
     fetchScreens();
   }, []);
-
-  // Handle WebSocket connection based on authentication status
-  useEffect(() => {
-    const token = localStorage.getItem('token'); // Check if the user is authenticated
-    if (token) {
-      socket.connect(); // Connect to the WebSocket server
-      socket.on('connect', () => {
-        console.log('Connected to WebSocket server');
-        setIsSocketConnected(true);
-      });
-      socket.on('disconnect', () => {
-        console.log('Disconnected from WebSocket server');
-        setIsSocketConnected(false);
-      });
-    } else {
-      setIsSocketConnected(false);
-    }
-
-    // Clean up WebSocket connection on logout or when the component unmounts
-    return () => {
-      if (isSocketConnected) {
-        socket.disconnect();
-      }
-    };
-  }, [isSocketConnected]);
 
   return (
     <Router>
