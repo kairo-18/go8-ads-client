@@ -1,59 +1,43 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
-    Modal,
-    Box,
-    Button,
-    Typography,
-    IconButton,
-    TextField,
-    Grid,
-} from "@mui/material";
-import UploadIcon from "@mui/icons-material/Upload";
-import DeleteIcon from "@mui/icons-material/Delete";
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Upload, Trash2, Edit } from "lucide-react";
 import axiosInstance from "../../axios/axiosInstance";
 
-const modalStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "80%",
-    maxHeight: "80vh",
-    bgcolor: "background.paper",
-    boxShadow: 24,
-    p: 4,
-    borderRadius: 2,
-    outline: "none",
-    display: "flex",
-    flexDirection: "column",
-    overflowY: "auto",
-};
-
-function AdsTable({ ads, screenId }) {
-    const [localAds, setLocalAds] = useState([]); // Renamed state
-    const [openUploadModal, setOpenUploadModal] = useState(false);
-    const [openDeleteModal, setOpenDeleteModal] = useState(false);
-    const [openUpdateModal, setOpenUpdateModal] = useState(false);
+function AdsTable({ ads: initialAds, screenId }) {
+    const [localAds, setLocalAds] = useState(initialAds);
     const [selectedAd, setSelectedAd] = useState(null);
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
-    // Ensure state sync when the prop changes
     useEffect(() => {
-        setLocalAds(ads);
-    }, [ads]);
+        setLocalAds(initialAds);
+    }, [initialAds]);
 
     const handleChangeAsset = (ad) => {
         setSelectedAd(ad);
-        setOpenUploadModal(true);
+        setIsUploadModalOpen(true);
     };
 
     const handleDeleteAd = (ad) => {
         setSelectedAd(ad);
-        setOpenDeleteModal(true);
+        setIsDeleteModalOpen(true);
     };
 
     const handleUpdateAd = (ad) => {
         setSelectedAd(ad);
-        setOpenUpdateModal(true);
+        setIsUpdateModalOpen(true);
     };
 
     const handleFileUpload = async (file) => {
@@ -63,7 +47,10 @@ function AdsTable({ ads, screenId }) {
         formData.append("ads", file);
 
         try {
-            const response = await axiosInstance.post("/ads-upload", formData);
+            const response = await axiosInstance.post(
+                "http://localhost:3000/ads-upload",
+                formData
+            );
             if (!response.data.fileUrl) throw new Error("File upload failed");
 
             const updatedAd = {
@@ -72,17 +59,16 @@ function AdsTable({ ads, screenId }) {
             };
 
             await axiosInstance.patch(
-                `/screens/${screenId}/ads/${selectedAd.id}`,
+                `http://localhost:3000/screens/${screenId}/ads/${selectedAd.id}`,
                 updatedAd
             );
 
-            // ✅ Update the local state to reflect changes immediately
             setLocalAds((prevAds) =>
                 prevAds.map((ad) => (ad.id === selectedAd.id ? updatedAd : ad))
             );
 
             alert("Ad updated successfully!");
-            setOpenUploadModal(false);
+            setIsUploadModalOpen(false);
         } catch (error) {
             console.error("Error uploading file:", error);
         }
@@ -91,16 +77,15 @@ function AdsTable({ ads, screenId }) {
     const confirmDeleteAd = async () => {
         try {
             await axiosInstance.delete(
-                `/screens/${screenId}/ads/${selectedAd.id}`
+                `http://localhost:3000/screens/${screenId}/ads/${selectedAd.id}`
             );
 
-            // ✅ Remove the deleted ad from state immediately
             setLocalAds((prevAds) =>
                 prevAds.filter((ad) => ad.id !== selectedAd.id)
             );
 
             alert("Ad deleted successfully!");
-            setOpenDeleteModal(false);
+            setIsDeleteModalOpen(false);
         } catch (error) {
             console.error("Error deleting ad:", error);
         }
@@ -109,17 +94,16 @@ function AdsTable({ ads, screenId }) {
     const handleUpdateAdDetails = async () => {
         try {
             await axiosInstance.patch(
-                `/screens/${screenId}/ads/${selectedAd.id}`,
+                `http://localhost:3000/screens/${screenId}/ads/${selectedAd.id}`,
                 selectedAd
             );
 
-            // ✅ Update the local state to reflect changes immediately
             setLocalAds((prevAds) =>
                 prevAds.map((ad) => (ad.id === selectedAd.id ? selectedAd : ad))
             );
 
             alert("Ad updated successfully!");
-            setOpenUpdateModal(false);
+            setIsUpdateModalOpen(false);
         } catch (error) {
             console.error("Error updating ad:", error);
         }
@@ -134,204 +118,161 @@ function AdsTable({ ads, screenId }) {
     }
 
     return (
-        <div className="mt-6 border rounded-lg shadow-md p-4 bg-white">
-            <Typography variant="h5" className="font-bold mb-4">
-                Ad Management
-            </Typography>
-            {localAds.map((ad, index) => {
-                const formattedStartDate = new Date(
-                    ad.startDate
-                ).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                });
-                const formattedEndDate = new Date(
-                    ad.endDate
-                ).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                });
-
-                return (
-                    <div
-                        key={index}
-                        className="p-4 border-b flex justify-between items-center"
-                    >
-                        {ad.mediaUrl && (
-                            <div className="mt-2">
-                                {ad.mediaUrl.match(/\.(jpeg|jpg|gif|png)$/) ? (
-                                    <img
-                                        src={ad.mediaUrl}
-                                        alt="Ad Preview"
-                                        className="max-w-full h-auto rounded-lg shadow-sm"
-                                        style={{ maxHeight: "200px" }}
-                                    />
-                                ) : ad.mediaUrl.match(/\.(mp4|webm|ogg)$/) ? (
-                                    <video
-                                        controls
-                                        src={ad.mediaUrl}
-                                        className="max-w-full h-auto rounded-lg shadow-sm"
-                                        style={{ maxHeight: "200px" }}
-                                    />
-                                ) : (
-                                    <p className="text-gray-600">
-                                        Unsupported file type for preview.
-                                    </p>
+        <Card className="mt-6 h-[65vh] overflow-y-scroll">
+            <CardHeader>
+                <CardTitle>Ad Management</CardTitle>
+            </CardHeader>
+            <CardContent>
+                {localAds.map((ad) => (
+                    <div key={ad.id} className="mb-6 p-4 border rounded-lg">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+                            <div className="mb-4 md:mb-0 md:mr-4">
+                                {ad.mediaUrl && (
+                                    <div className="relative w-full h-48 md:w-64 md:h-48">
+                                        {ad.mediaUrl.match(
+                                            /\.(jpeg|jpg|gif|png)$/
+                                        ) ? (
+                                            <img
+                                                src={
+                                                    ad.mediaUrl ||
+                                                    "/placeholder.svg"
+                                                }
+                                                alt="Ad Preview"
+                                                layout="fill"
+                                                objectFit="cover"
+                                                className="rounded-lg h-full"
+                                            />
+                                        ) : ad.mediaUrl.match(
+                                              /\.(mp4|webm|ogg)$/
+                                          ) ? (
+                                            <video
+                                                src={ad.mediaUrl}
+                                                controls
+                                                className="w-full h-full rounded-lg"
+                                            />
+                                        ) : (
+                                            <p className="text-gray-600">
+                                                Unsupported file type for
+                                                preview.
+                                            </p>
+                                        )}
+                                    </div>
                                 )}
                             </div>
-                        )}
-
-                        <div className="ml-4 flex-grow">
-                            <Typography variant="h6" className="font-semibold">
-                                Title: {ad.title}
-                            </Typography>
-                            <Typography className="text-gray-600">
-                                Start Date: {formattedStartDate}
-                            </Typography>
-                            <Typography className="text-gray-600">
-                                End Date: {formattedEndDate}
-                            </Typography>
-                            <Typography className="text-gray-600">
-                                Duration: {ad.duration}
-                            </Typography>
-                        </div>
-
-                        <div className="flex flex-col space-y-2">
-                            <Button
-                                variant="outlined"
-                                color="primary"
-                                onClick={() => handleChangeAsset(ad)}
-                                className="text-blue-500 border-blue-500"
-                            >
-                                Change asset
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                color="primary"
-                                onClick={() => handleUpdateAd(ad)}
-                                className="text-blue-500 border-blue-500"
-                            >
-                                Update
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                onClick={() => handleDeleteAd(ad)}
-                                className="text-red-500 border-red-500"
-                            >
-                                Terminate ad
-                            </Button>
+                            <div className="flex-grow">
+                                <h3 className="text-lg font-semibold">
+                                    {ad.title}
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    Start Date:{" "}
+                                    {new Date(ad.startDate).toLocaleString()}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                    End Date:{" "}
+                                    {new Date(ad.endDate).toLocaleString()}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                    Duration: {ad.duration}
+                                </p>
+                            </div>
+                            <div className="flex flex-col space-y-2 mt-4 md:mt-0">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => handleChangeAsset(ad)}
+                                >
+                                    <Upload className="w-4 h-4 mr-2" />
+                                    Change asset
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => handleUpdateAd(ad)}
+                                >
+                                    <Edit className="w-4 h-4 mr-2" />
+                                    Update
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    onClick={() => handleDeleteAd(ad)}
+                                >
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Terminate ad
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                );
-            })}
+                ))}
+            </CardContent>
 
-            {/* Upload Modal */}
-            <Modal
-                open={openUploadModal}
-                onClose={() => setOpenUploadModal(false)}
+            <Dialog
+                open={isUploadModalOpen}
+                onOpenChange={setIsUploadModalOpen}
             >
-                <Box
-                    sx={modalStyle}
-                    className="bg-white p-6 rounded-lg shadow-lg"
-                >
-                    <Typography
-                        variant="h6"
-                        component="h2"
-                        className="text-blue-500"
-                    >
-                        Upload New Asset
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        component="label"
-                        startIcon={<UploadIcon />}
-                        className="mt-4 bg-blue-500 hover:bg-blue-700"
-                    >
-                        Upload File
-                        <input
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Upload New Asset</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                        <Label htmlFor="picture">Picture</Label>
+                        <Input
+                            id="picture"
                             type="file"
                             accept="image/*,video/*"
-                            hidden
                             onChange={(e) =>
                                 handleFileUpload(e.target.files[0])
                             }
                         />
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        onClick={() => setOpenUploadModal(false)}
-                        className="mt-4 border-blue-500 text-blue-500 hover:bg-blue-100"
-                    >
-                        Cancel
-                    </Button>
-                </Box>
-            </Modal>
+                    </div>
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsUploadModalOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
-            {/* Delete Confirmation Modal */}
-            <Modal
-                open={openDeleteModal}
-                onClose={() => setOpenDeleteModal(false)}
+            <Dialog
+                open={isDeleteModalOpen}
+                onOpenChange={setIsDeleteModalOpen}
             >
-                <Box
-                    sx={modalStyle}
-                    className="bg-white p-6 rounded-lg shadow-lg"
-                >
-                    <Typography
-                        variant="h6"
-                        component="h2"
-                        className="text-red-500"
-                    >
-                        Confirm Delete
-                    </Typography>
-                    <Typography variant="body1" className="mt-2">
-                        Are you sure you want to delete this ad?
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={confirmDeleteAd}
-                        className="mt-4 bg-red-500 hover:bg-red-700"
-                    >
-                        Delete
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        onClick={() => setOpenDeleteModal(false)}
-                        className="mt-4 border-red-500 text-red-500 hover:bg-red-100"
-                    >
-                        Cancel
-                    </Button>
-                </Box>
-            </Modal>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Confirm Delete</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to delete this ad?
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="destructive" onClick={confirmDeleteAd}>
+                            Delete
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsDeleteModalOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
-            {/* Update Modal */}
-            <Modal
-                open={openUpdateModal}
-                onClose={() => setOpenUpdateModal(false)}
+            <Dialog
+                open={isUpdateModalOpen}
+                onOpenChange={setIsUpdateModalOpen}
             >
-                <Box
-                    sx={modalStyle}
-                    className="bg-white p-6 rounded-lg shadow-lg"
-                >
-                    <Typography
-                        variant="h6"
-                        component="h2"
-                        className="text-yellow-500"
-                    >
-                        Update Ad Details
-                    </Typography>
-                    <Grid container spacing={3} className="mt-4">
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth
-                                label="Ad Title"
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Update Ad Details</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="title" className="text-right">
+                                Title
+                            </Label>
+                            <Input
+                                id="title"
                                 value={selectedAd?.title || ""}
                                 onChange={(e) =>
                                     setSelectedAd({
@@ -339,13 +280,15 @@ function AdsTable({ ads, screenId }) {
                                         title: e.target.value,
                                     })
                                 }
-                                variant="outlined"
+                                className="col-span-3"
                             />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth
-                                label="Slot"
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="slot" className="text-right">
+                                Slot
+                            </Label>
+                            <Input
+                                id="slot"
                                 value={selectedAd?.slot || ""}
                                 onChange={(e) =>
                                     setSelectedAd({
@@ -353,43 +296,41 @@ function AdsTable({ ads, screenId }) {
                                         slot: e.target.value,
                                     })
                                 }
-                                variant="outlined"
+                                className="col-span-3"
                             />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth
-                                label="Duration"
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="duration" className="text-right">
+                                Duration
+                            </Label>
+                            <Input
+                                id="duration"
                                 type="number"
                                 value={selectedAd?.duration || ""}
                                 onChange={(e) =>
                                     setSelectedAd({
                                         ...selectedAd,
-                                        duration: e.target.value,
+                                        duration: Number.parseInt(
+                                            e.target.value
+                                        ),
                                     })
                                 }
-                                variant="outlined"
+                                className="col-span-3"
                             />
-                        </Grid>
-                    </Grid>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleUpdateAdDetails}
-                        className="mt-4 bg-yellow-500 hover:bg-yellow-700"
-                    >
-                        Update
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        onClick={() => setOpenUpdateModal(false)}
-                        className="mt-4 border-yellow-500 text-yellow-500 hover:bg-yellow-100"
-                    >
-                        Cancel
-                    </Button>
-                </Box>
-            </Modal>
-        </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button onClick={handleUpdateAdDetails}>Update</Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsUpdateModalOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </Card>
     );
 }
 

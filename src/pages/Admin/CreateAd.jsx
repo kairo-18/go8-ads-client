@@ -1,28 +1,41 @@
-import React from "react";
-import SideBar from "../SideBar";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import axiosInstance from "../../../src/axios/axiosInstance";
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-    Button,
-    TextField,
-    Grid,
-    Box,
-    Checkbox,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon, Upload } from "lucide-react";
+import { format } from "date-fns";
+import Sidebar from "../SideBar";
+import {
     FormControlLabel,
     FormGroup,
     InputLabel,
     MenuItem,
     FormControl,
-    Select,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../../src/axios/axiosInstance";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 
 function CreateAd() {
-    const [data, setData] = React.useState({
+    const [data, setData] = useState({
         screens: [],
         ads: [],
         displayedAds: 0,
@@ -30,15 +43,14 @@ function CreateAd() {
 
     const navigate = useNavigate();
 
-    const [selectedScreens, setSelectedScreens] = React.useState([]);
-    const [ads, setAds] = React.useState([]); // Initialize as an empty array
+    const [selectedScreens, setSelectedScreens] = useState([]);
+    const [ads, setAds] = useState([]); // Initialize as an empty array
 
-    const handleScreenChange = (event) => {
-        const {
-            target: { value },
-        } = event;
-        setSelectedScreens(
-            typeof value === "string" ? value.split(",") : value
+    const handleScreenChange = (screenId) => {
+        setSelectedScreens((prevSelectedScreens) =>
+            prevSelectedScreens.includes(screenId)
+                ? prevSelectedScreens.filter((id) => id !== screenId)
+                : [...prevSelectedScreens, screenId]
         );
     };
 
@@ -76,8 +88,8 @@ function CreateAd() {
         setAds(selectedAds);
     }, [selectedScreens, data.screens]);
 
-    const [layoutType, setLayoutType] = React.useState("Res1");
-    const [adDetails, setAdDetails] = React.useState({
+    const [layoutType, setLayoutType] = useState("Res1");
+    const [adDetails, setAdDetails] = useState({
         title: "",
         slot: "",
         startDate: null,
@@ -122,8 +134,12 @@ function CreateAd() {
 
     const getPlaceholderImages = () => {
         const layoutTypes = selectedScreens.flatMap((screenId) => {
-            const screen = data.screens.find((screen) => screen.id === screenId);
-            return screen ? [{ layoutType: screen.layoutType, name: screen.name }] : [];
+            const screen = data.screens.find(
+                (screen) => screen.id === screenId
+            );
+            return screen
+                ? [{ layoutType: screen.layoutType, name: screen.name }]
+                : [];
         });
         return layoutTypes.map((screen, index) => (
             <div key={index}>
@@ -131,131 +147,149 @@ function CreateAd() {
                     src={`https://placehold.co/400x300?text=${screen.layoutType}`}
                     alt={screen.layoutType}
                 />
-                <h2>{screen.layoutType} - {screen.name}</h2>
+                <h2>
+                    {screen.layoutType} - {screen.name}
+                </h2>
             </div>
         ));
     };
 
     return (
-        <div>
-            <SideBar />
-            <div className="w-full h-screen p-10 bg-gray-50">
-                <div className="ml-64">
-                    <h1 className="font-bold text-2xl">Ad Settings</h1>
+        <>
+            <Sidebar />
+            <div className="container ml-[260px] pt-8 px-4">
+                <h1 className="text-3xl font-bold mb-6">Ad Settings</h1>
 
-                    <div className="flex gap-20">
-                        <div>
-                            <h3 className="font-bold text-xl mt-10">Screens</h3>
-                            {/* Material UI screen multiple select */}
-                            <FormControl sx={{ minWidth: 300 }}>
-                                <InputLabel id="multiple-screens-label">
-                                    Screens
-                                </InputLabel>
-                                <Select
-                                    labelId="multiple-screens-label"
-                                    id="multiple-screens"
-                                    multiple
-                                    value={selectedScreens}
-                                    onChange={handleScreenChange}
-                                    renderValue={(selected) =>
-                                        selected
-                                            .map(
-                                                (screenId) =>
-                                                    data.screens.find(
-                                                        (screen) =>
-                                                            screen.id ===
-                                                            screenId
-                                                    )?.name
-                                            )
-                                            .join(", ")
-                                    }
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Screens</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {data.screens.map((screen) => (
+                                <div
+                                    key={screen.id}
+                                    className="flex items-center space-x-2 mb-2"
                                 >
-                                    {data.screens.map((screen) => (
-                                        <MenuItem key={screen.id} value={screen.id}>
-                                            <Checkbox
-                                                checked={selectedScreens.includes(
-                                                    screen.id
-                                                )}
-                                            />
-                                            {screen.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </div>
+                                    <Checkbox
+                                        id={`screen-${screen.id}`}
+                                        checked={selectedScreens.includes(
+                                            screen.id
+                                        )}
+                                        onCheckedChange={() =>
+                                            handleScreenChange(screen.id)
+                                        }
+                                    />
+                                    <Label htmlFor={`screen-${screen.id}`}>
+                                        {screen.name}
+                                    </Label>
+                                </div>
+                            ))}
+                        </CardContent>
+                    </Card>
 
-                        <div>
-                            <h3 className="font-bold text-xl mt-10">Status</h3>
-                            <p className="mt-3 text-red-500">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Status</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p
+                                className={
+                                    ads.length > 0
+                                        ? "text-green-600"
+                                        : "text-red-600"
+                                }
+                            >
                                 {ads.length > 0
                                     ? `${ads.length} ads found.`
                                     : "Inactive (No active ads)."}
                             </p>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
+                </div>
 
-                    <div className="">
-                        {/* Button for creating a new ad  */}
-                        <hr className="mt-5" />
-
-                        <h1 className="text-xl font-light mt-5">
-                            Start Advertising
-                        </h1>
-                        {/* select new layout type  */}
-                        <div className="flex gap-5">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Start Advertising</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                             {getPlaceholderImages()}
                         </div>
 
-                        <div className="mt-10">
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <Grid container spacing={3}>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth
-                                            label="Ad Title"
-                                            value={adDetails.title}
-                                            onChange={(e) =>
-                                                setAdDetails({
-                                                    ...adDetails,
-                                                    title: e.target.value,
-                                                })
-                                            }
-                                            variant="outlined"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth
-                                            label="Slot"
-                                            value={adDetails.slot}
-                                            onChange={(e) =>
-                                                setAdDetails({
-                                                    ...adDetails,
-                                                    slot: e.target.value,
-                                                })
-                                            }
-                                            variant="outlined"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <DateTimePicker
-                                            label="Start Date"
-                                            value={adDetails.startDate}
-                                            onChange={(newDate) =>
-                                                setAdDetails({
-                                                    ...adDetails,
-                                                    startDate: newDate,
-                                                })
-                                            }
-                                            renderInput={(props) => (
-                                                <TextField
-                                                    {...props}
-                                                    fullWidth
-                                                />
-                                            )}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                                <div>
+                                    <Label htmlFor="title">Ad Title</Label>
+                                    <Input
+                                        id="title"
+                                        value={adDetails.title}
+                                        onChange={(e) =>
+                                            setAdDetails({
+                                                ...adDetails,
+                                                title: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="slot">Slot</Label>
+                                    <Input
+                                        id="slot"
+                                        value={adDetails.slot}
+                                        onChange={(e) =>
+                                            setAdDetails({
+                                                ...adDetails,
+                                                slot: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="duration">Duration</Label>
+                                    <Input
+                                        id="duration"
+                                        type="number"
+                                        value={adDetails.duration}
+                                        onChange={(e) =>
+                                            setAdDetails({
+                                                ...adDetails,
+                                                duration: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <div>
+                                    <Label>Start Date</Label>
+                                    <Popover>
+                                        <LocalizationProvider
+                                            dateAdapter={AdapterDayjs}
+                                        >
+                                            <DateTimePicker
+                                                label="Start Date"
+                                                value={adDetails.startDate}
+                                                onChange={(newDate) =>
+                                                    setAdDetails({
+                                                        ...adDetails,
+                                                        startDate: newDate,
+                                                    })
+                                                }
+                                                renderInput={(props) => (
+                                                    <TextField
+                                                        {...props}
+                                                        fullWidth
+                                                    />
+                                                )}
+                                            />
+                                        </LocalizationProvider>
+                                    </Popover>
+                                </div>
+                                <div>
+                                    <Label>End Date</Label>
+                                    <Popover>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DateTimePicker
                                             label="End Date"
                                             value={adDetails.endDate}
@@ -272,55 +306,34 @@ function CreateAd() {
                                                 />
                                             )}
                                         />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth
-                                            label="Duration"
-                                            type="number"
-                                            value={adDetails.duration}
+                                        </LocalizationProvider>
+                                    </Popover>
+                                </div>
+                                <div>
+                                    <Label htmlFor="file">Upload File</Label>
+                                    <div className="mt-1">
+                                        <Input
+                                            id="file"
+                                            type="file"
+                                            accept="image/*,video/*"
                                             onChange={(e) =>
-                                                setAdDetails({
-                                                    ...adDetails,
-                                                    duration: e.target.value,
-                                                })
+                                                handleFileUpload(
+                                                    e.target.files[0]
+                                                )
                                             }
-                                            variant="outlined"
                                         />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Button
-                                            variant="contained"
-                                            component="label"
-                                        >
-                                            Upload File
-                                            <input
-                                                type="file"
-                                                accept="image/*,video/*"
-                                                hidden
-                                                onChange={(e) =>
-                                                    handleFileUpload(
-                                                        e.target.files[0]
-                                                    )
-                                                }
-                                            />
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-                            </LocalizationProvider>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handleCreateAd}
-                                className="mt-4"
-                            >
-                                Create Ad
-                            </Button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+
+                        <Button onClick={handleCreateAd} className="mt-6">
+                            Create Ad
+                        </Button>
+                    </CardContent>
+                </Card>
             </div>
-        </div>
+        </>
     );
 }
 
