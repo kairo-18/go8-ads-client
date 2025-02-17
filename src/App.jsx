@@ -16,17 +16,18 @@ import AdminPanel from './pages/Admin/AdminPanel';
 import AdminPreviews from './pages/Admin/AdminPreviews';
 import AdSettings from './pages/Admin/AdSettings';
 import Scheduling from './pages/Admin/Scheduling';
+import Availability from './pages/Availability';
 import socket from './socket-config/socket'; // Import the socket instance
 
 // PrivateRoute component to protect admin routes
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('token'); // Or wherever the token is stored
-  
+
   if (!token) {
     // Redirect to login page if no token found
     return <Navigate to="/admin" />;
   }
-  
+
   return children;
 };
 
@@ -96,45 +97,45 @@ function App() {
 
         {/* Admin Routes with PrivateRoute wrapper */}
         <Route path="/admin" element={<AdminLogin />} />
-        
-        <Route 
-          path="/admin/dashboard2" 
+
+        <Route
+          path="/admin/dashboard2"
           element={
             <PrivateRoute>
               <AdminDashboard />
             </PrivateRoute>
           }
         />
-        
-        <Route 
-          path="/admin/dashboard" 
+
+        <Route
+          path="/admin/dashboard"
           element={
             <PrivateRoute>
               <AdminPanel />
             </PrivateRoute>
           }
         />
-        
-        <Route 
-          path="/admin/crud/create" 
+
+        <Route
+          path="/admin/crud/create"
           element={
             <PrivateRoute>
               <CreateScreen />
             </PrivateRoute>
           }
         />
-        
-        <Route 
-          path="/admin/crud/update" 
+
+        <Route
+          path="/admin/crud/update"
           element={
             <PrivateRoute>
               <UpdateScreen />
             </PrivateRoute>
           }
         />
-        
-        <Route 
-          path="/admin/crud/createAnnouncement" 
+
+        <Route
+          path="/admin/crud/createAnnouncement"
           element={
             <PrivateRoute>
               <CreateAnnouncement />
@@ -142,31 +143,41 @@ function App() {
           }
         />
 
-        <Route 
-          path='/admin/previews' 
+        <Route
+          path='/admin/previews'
           element={
             <PrivateRoute>
               <AdminPreviews />
             </PrivateRoute>
-          } 
+          }
         />
-        <Route 
-          path='/admin/ad-setting' 
+        <Route
+          path='/admin/ad-setting'
           element={
             <PrivateRoute>
               <AdSettings />
             </PrivateRoute>
-          } 
+          }
         />
-        <Route 
-          path='/admin/scheduling' 
+        <Route
+          path='/admin/scheduling'
           element={
             <PrivateRoute>
               <Scheduling />
             </PrivateRoute>
-          } 
+          }
         />
-        
+
+        {/* Kaycee's shit*/}
+        <Route
+          path='/availability'
+          element={
+            <PrivateRoute>
+              <Availability />
+            </PrivateRoute>
+          }
+        />
+
       </Routes>
     </Router>
   );
