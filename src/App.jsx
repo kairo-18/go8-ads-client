@@ -15,6 +15,7 @@ import SideBar from './pages/SideBar';
 import AdminPanel from './pages/Admin/AdminPanel';
 import AdminPreviews from './pages/Admin/AdminPreviews';
 import AdSettings from './pages/Admin/AdSettings';
+import Scheduling from './pages/Admin/Scheduling';
 import socket from './socket-config/socket'; // Import the socket instance
 
 // PrivateRoute component to protect admin routes
