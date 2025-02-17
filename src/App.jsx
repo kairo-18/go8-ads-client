@@ -4,13 +4,17 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import Res1 from './components/Res1/Res1';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
-import AdminCRUD from './pages/AdminCRUD';
+import AdminCRUD from './pages/SideBar';
 import CreateScreen from './pages/CRUD/CreateScreen';
 import UpdateScreen from './pages/CRUD/UpdateScreen';
 import Res2 from './components/Res2/Res2';
 import Res3 from './components/Res3/Res3';
 import axiosInstance from './axios/axiosInstance';
 import CreateAnnouncement from './components/Announcement/CreateAnnouncement';
+import SideBar from './pages/SideBar';
+import AdminPanel from './pages/Admin/AdminPanel';
+import AdminPreviews from './pages/Admin/AdminPreviews';
+import AdSettings from './pages/Admin/AdSettings';
 import socket from './socket-config/socket'; // Import the socket instance
 
 // PrivateRoute component to protect admin routes
@@ -93,7 +97,7 @@ function App() {
         <Route path="/admin" element={<AdminLogin />} />
         
         <Route 
-          path="/admin/dashboard" 
+          path="/admin/dashboard2" 
           element={
             <PrivateRoute>
               <AdminDashboard />
@@ -102,10 +106,10 @@ function App() {
         />
         
         <Route 
-          path="/admin/crud" 
+          path="/admin/dashboard" 
           element={
             <PrivateRoute>
-              <AdminCRUD />
+              <AdminPanel />
             </PrivateRoute>
           }
         />
@@ -136,6 +140,32 @@ function App() {
             </PrivateRoute>
           }
         />
+
+        <Route 
+          path='/admin/previews' 
+          element={
+            <PrivateRoute>
+              <AdminPreviews />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path='/admin/ad-setting' 
+          element={
+            <PrivateRoute>
+              <AdSettings />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path='/admin/scheduling' 
+          element={
+            <PrivateRoute>
+              <Scheduling />
+            </PrivateRoute>
+          } 
+        />
+        
       </Routes>
     </Router>
   );
