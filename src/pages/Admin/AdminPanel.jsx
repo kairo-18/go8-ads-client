@@ -1,18 +1,24 @@
 import React from "react";
 import SideBar from "../SideBar";
 import ScreenPreview from "../../components/Admin/ScreenPreview";
-import Res1 from "../../components/Res1/Res1";
-import Res2 from "../../components/Res2/Res2";
-import Res3 from "../../components/Res3/Res3";
-import { useNavigate } from "react-router-dom";
+import DashboardStats from "../../components/Admin/DashboardStats";
 
 function AdminPanel() {
     return (
-        <div className="">
+        <div className="flex">
             <SideBar />
-            <div className="w-full h-screen p-10 bg-gray-50">
-                <div className="ml-64">
-                    <h1 className="font-bold text-2xl">Dashboard</h1>
+            <div className="flex-1 p-10 bg-[#F2E9E9] h-screen overflow-auto">
+                <div className="ml-64 border border-[#d9d9d9] rounded-sm">
+                    <h1 className="text-2xl font-bold p-5 ">Dashboard</h1>
+
+                    <DashboardStats />
+
+                    <div className="bg-[#F2E9E9] rounded-sm p-5">
+                        <h2 className="text-lg">Preview</h2>
+                        <div className="flex justify-between">
+                            <ScreenPreview />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
