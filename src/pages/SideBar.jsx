@@ -16,7 +16,7 @@ function SideBar() {
             <div className="flex flex-col justify-between h-full ">
                 <div className="">
                     <ul>
-                        {["Dashboard", "Previews", "Ad Setting", "Scheduling"].map(
+                        {["Dashboard", "Previews", "Ad Setting", "Scheduling", "Announcement"].map(
                             (text) => (
                                 <li key={text} className="p-0">
                                     <button

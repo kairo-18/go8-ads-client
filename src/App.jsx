@@ -17,6 +17,7 @@ import AdminPreviews from './pages/Admin/AdminPreviews';
 import AdSettings from './pages/Admin/AdSettings';
 import Scheduling from './pages/Admin/Scheduling';
 import Availability from './pages/Availability';
+import Announcement from './pages/Admin/Announcement';
 import socket from './socket-config/socket'; // Import the socket instance
 
 // PrivateRoute component to protect admin routes
@@ -174,6 +175,16 @@ function App() {
           element={
             <PrivateRoute>
               <Availability />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Dors shit*/}
+        <Route 
+          path='/admin/announcement' 
+          element={
+            <PrivateRoute>
+              <Announcement />
             </PrivateRoute>
           }
         />
