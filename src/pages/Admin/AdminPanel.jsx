@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from '../../axios/axiosInstance';
 import icon_PostAds from "../../assets/adminPanel/icon_PostAds.png";
 
-
 function AdminPanel() {
     const navigate = useNavigate();
     const [data, setData] = useState({ screens: [], ads: [], displayedAds: 0 });
@@ -17,9 +16,6 @@ function AdminPanel() {
         const fetchData = async () => {
             try {
                 const screensResponse = await axiosInstance.get('http://localhost:3000/screens');
-
-
-                // Extract ads from screens since there's no direct GET /ads route
                 const allAds = screensResponse.data.flatMap((screen) => screen.ads || []);
 
                 setData({
@@ -32,27 +28,34 @@ function AdminPanel() {
             }
         };
         fetchData();
-    }, []); // Add data as a dependency
+    }, []);
 
     return (
-        <div className="">
+        <div className="flex">
             <SideBar />
-            <div className="w-full h-screen p-10 bg-[#F2E9E9] ">
-                <div className="ml-64 border border-[#d9d9d9] pb-10 rounded-sm ">
+            <div className="flex-1 p-10 bg-[#F2E9E9] h-screen overflow-auto">
+                <div className="ml-64 border border-[#d9d9d9] pb-10 rounded-sm">
                     <h1 className="text-2xl font-bold p-5 pb-10">Dashboard</h1>
 
                     <div className="flex flex-wrap p-4 px-6 mx-5 text-md border border-[#d9d9d9] rounded-sm">
-                        <div className="flex-1 bg-white border border-[#d9d9d9] p-4 rounded mr-4">
+                        <div className="flex-1 bg-white border border-[#d9d9d9] p-4 rounded mr-4 mb-4 sm:mb-0">
                             <h2> 🖥️ Active Screens <span className="float-right">{data.screens.length}</span></h2>
                         </div>
-                        <div className="flex-1 bg-white border border-[#d9d9d9] p-4 rounded mr-4">
+                        <div className="flex-1 bg-white border border-[#d9d9d9] p-4 rounded mr-4 mb-4 sm:mb-0">
                             <h2>
-                            <img src={icon_PostAds} alt="Post Ads Icon" className="size-6 inline-block mr-2" />
-                            Active Ads <span className="float-right">{data.ads.length}</span>
+                                <img src={icon_PostAds} alt="Post Ads Icon" className="size-6 inline-block mr-2" />
+                                Active Ads <span className="float-right">{data.ads.length}</span>
                             </h2>
                         </div>
-                        <div className="flex-1 bg-white border border-[#d9d9d9] p-4 rounded">
+                        <div className="flex-1 bg-white border border-[#d9d9d9] p-4 rounded mb-4 sm:mb-0">
                             <h2 className="text-md">🖥️ Displayed Ads <span className="float-right">{data.displayedAds}</span></h2>
+                        </div>
+                    </div>
+
+                    <div className="bg-[#F2E9E9] rounded-sm p-5">
+                        <h2 className="text-lg">Preview</h2>
+                        <div className="flex justify-between">
+                            <ScreenPreview screens={data.screens} />
                         </div>
                     </div>
                 </div>
