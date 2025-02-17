@@ -1,12 +1,9 @@
 import React, { useEffect, useState, useContext } from "react";
 import SideBar from "../SideBar";
 import ScreenPreview from "../../components/Admin/ScreenPreview";
-import Res1 from "../../components/Res1/Res1";
-import Res2 from "../../components/Res2/Res2";
-import Res3 from "../../components/Res3/Res3";
+import DashboardStats from "../../components/Admin/DashboardStats";  // Import the new component
 import { useNavigate } from "react-router-dom";
 import axiosInstance from '../../axios/axiosInstance';
-import icon_PostAds from "../../assets/adminPanel/icon_PostAds.png";
 
 function AdminPanel() {
     const navigate = useNavigate();
@@ -34,23 +31,14 @@ function AdminPanel() {
         <div className="flex">
             <SideBar />
             <div className="flex-1 p-10 bg-[#F2E9E9] h-screen overflow-auto">
-                <div className="ml-64 border border-[#d9d9d9] pb-10 rounded-sm">
-                    <h1 className="text-2xl font-bold p-5 pb-10">Dashboard</h1>
+                <div className="ml-64 border border-[#d9d9d9] rounded-sm">
+                    <h1 className="text-2xl font-bold p-5 ">Dashboard</h1>
 
-                    <div className="flex flex-wrap p-4 px-6 mx-5 text-md border border-[#d9d9d9] rounded-sm">
-                        <div className="flex-1 bg-white border border-[#d9d9d9] p-4 rounded mr-4 mb-4 sm:mb-0">
-                            <h2> 🖥️ Active Screens <span className="float-right">{data.screens.length}</span></h2>
-                        </div>
-                        <div className="flex-1 bg-white border border-[#d9d9d9] p-4 rounded mr-4 mb-4 sm:mb-0">
-                            <h2>
-                                <img src={icon_PostAds} alt="Post Ads Icon" className="size-6 inline-block mr-2" />
-                                Active Ads <span className="float-right">{data.ads.length}</span>
-                            </h2>
-                        </div>
-                        <div className="flex-1 bg-white border border-[#d9d9d9] p-4 rounded mb-4 sm:mb-0">
-                            <h2 className="text-md">🖥️ Displayed Ads <span className="float-right">{data.displayedAds}</span></h2>
-                        </div>
-                    </div>
+                    <DashboardStats
+                        screens={data.screens}
+                        ads={data.ads}
+                        displayedAds={data.displayedAds}
+                    />
 
                     <div className="bg-[#F2E9E9] rounded-sm p-5">
                         <h2 className="text-lg">Preview</h2>
