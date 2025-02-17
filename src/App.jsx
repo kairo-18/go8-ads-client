@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import './App.css'
+import { useEffect, useState } from 'react';
+import './App.css';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Res1 from './components/Res1/Res1';
 import AdminLogin from './pages/AdminLogin';
@@ -15,7 +15,7 @@ import SideBar from './pages/SideBar';
 import AdminPanel from './pages/Admin/AdminPanel';
 import AdminPreviews from './pages/Admin/AdminPreviews';
 import AdSettings from './pages/Admin/AdSettings';
-import Scheduling from './pages/Admin/Scheduling';
+import socket from './socket-config/socket'; // Import the socket instance
 
 // PrivateRoute component to protect admin routes
 const PrivateRoute = ({ children }) => {
@@ -30,18 +30,16 @@ const PrivateRoute = ({ children }) => {
 };
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [screens, setScreens] = useState([])
+  const [count, setCount] = useState(0);
+  const [screens, setScreens] = useState([]);
+  const [isSocketConnected, setIsSocketConnected] = useState(false);
 
   useEffect(() => {
     const fetchScreens = async () => {
       try {
         const response = await axiosInstance.get("http://localhost:3000/screens");
-  
         setScreens((prevScreens) => {
           const newScreens = response.data;
-  
-          // Only update state if the data has changed
           if (JSON.stringify(prevScreens) !== JSON.stringify(newScreens)) {
             return newScreens;
           }
@@ -51,10 +49,34 @@ function App() {
         console.error("Error fetching screens:", error);
       }
     };
-  
     fetchScreens();
-  }, []); // Dependency array ensures it only runs once
-  
+  }, []);
+
+  // Handle WebSocket connection based on authentication status
+  useEffect(() => {
+    const token = localStorage.getItem('token'); // Check if the user is authenticated
+    if (token) {
+      socket.connect(); // Connect to the WebSocket server
+      socket.on('connect', () => {
+        console.log('Connected to WebSocket server');
+        setIsSocketConnected(true);
+      });
+      socket.on('disconnect', () => {
+        console.log('Disconnected from WebSocket server');
+        setIsSocketConnected(false);
+      });
+    } else {
+      setIsSocketConnected(false);
+    }
+
+    // Clean up WebSocket connection on logout or when the component unmounts
+    return () => {
+      if (isSocketConnected) {
+        socket.disconnect();
+      }
+    };
+  }, [isSocketConnected]);
+
   return (
     <Router>
       <Routes>
@@ -146,7 +168,7 @@ function App() {
         
       </Routes>
     </Router>
-  )
+  );
 }
 
 export default App;

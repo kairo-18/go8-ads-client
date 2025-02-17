@@ -3,6 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import FlightBoard from "../Res1/FlightBoard";
 import AnnouncementScreen from "../Announcement/AnnouncementScreen";
 import axios from "axios";
+import io from "socket.io-client";
+
+// Assuming your server is running at localhost:3000
+const socket = io("http://localhost:3000"); // Connect to your WebSocket server
 
 function Res3({ screenId }) {
     const [isAds, toggleAds] = useState(false);
@@ -13,6 +17,7 @@ function Res3({ screenId }) {
     const [announcementIndex, setAnnouncementIndex] = useState(0);
 
     useEffect(() => {
+        // Fetch announcements from the server
         const fetchAnnouncements = async () => {
             try {
                 const response = await axios.get("http://localhost:3000/announcements");
@@ -23,8 +28,20 @@ function Res3({ screenId }) {
         };
 
         fetchAnnouncements();
-        const interval = setInterval(fetchAnnouncements, 5000);
+        const interval = setInterval(fetchAnnouncements, 5000); // Fetch new announcements every 5 seconds
         return () => clearInterval(interval);
+    }, []);
+
+    // Listen for new announcements via WebSocket
+    useEffect(() => {
+        socket.on("newAnnouncement", (newAnnouncement) => {
+            console.log("New announcement received:", newAnnouncement);
+            setAnnouncements((prev) => [...prev, newAnnouncement]); // Add new announcement to the list
+        });
+
+        return () => {
+            socket.off("newAnnouncement"); // Clean up listener on component unmount
+        };
     }, []);
 
     useEffect(() => {
