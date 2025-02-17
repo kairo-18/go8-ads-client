@@ -98,6 +98,8 @@ const CreateScreen = ({ open, onClose }) => {
                 name: "",
                 routeName: "",
                 layoutType: "",
+                slot: "left",
+                duration: 10,
                 ads: [{ title: "", mediaUrl: "" }],
             });
             onClose();

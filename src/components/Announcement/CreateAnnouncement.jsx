@@ -56,12 +56,7 @@ const CreateAnnouncement = () => {
     setLoading(true);
 
     try {
-      // Step 1: Create the announcement via API
-      const response = await axios.post("http://localhost:3000/announcements", {
-        ...formData,
-        duration: Number(formData.duration),
-      });
-
+  
       // Step 2: Emit the 'createAnnouncement' event to WebSocket server
       socket.emit('createAnnouncement', {
         title: formData.title,
