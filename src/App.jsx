@@ -143,18 +143,10 @@ function App() {
             </PrivateRoute>
           } 
         />
-        <Route 
-          path='/admin/scheduling' 
-          element={
-            <PrivateRoute>
-              <Scheduling />
-            </PrivateRoute>
-          }
-        />
 
         {/* Kaycee's shit*/}
         <Route
-          path='/availability'
+          path='/admin/availability'
           element={
             <PrivateRoute>
               <Availability />
