@@ -26,6 +26,8 @@ import {
     InputLabel,
     MenuItem,
     FormControl,
+    Autocomplete,
+    TextField,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../src/axios/axiosInstance";
@@ -154,11 +156,40 @@ function CreateAd() {
         ));
     };
 
+    const getSlotOptions = () => {
+        const layoutTypes = selectedScreens.flatMap((screenId) => {
+            const screen = data.screens.find(
+                (screen) => screen.id === screenId
+            );
+            return screen ? screen.layoutType : [];
+        });
+
+        const uniqueLayoutTypes = [...new Set(layoutTypes)];
+
+        if (uniqueLayoutTypes.length === 1) {
+            switch (uniqueLayoutTypes[0]) {
+                case "Res1":
+                    return ["Side"];
+                case "Res2":
+                    return ["Upper", "Lower"];
+                case "Res3":
+                    return ["Side", "Bottom"];
+                default:
+                    return [];
+            }
+        }
+
+        return [];
+    };
+
     return (
-        <>
+        <div className="flex bg-[#F2E9E9] h-screen">
+            {/* Sidebar */}
             <Sidebar />
-            <div className="container w-[80vw] ml-[280px] pt-18 px-4">
-                <h1 className="text-3xl font-bold mb-6">Ad Settings</h1>
+
+            {/* Main Content */}
+            <div className="flex-1 p-5 px-10 w-full max-w-[1300px] mx-auto md:ml-[255px] overflow-auto">
+                <h1 className="text-3xl font-bold mb-6 ">Ad Settings</h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <Card>
@@ -166,26 +197,27 @@ function CreateAd() {
                             <CardTitle>Screens</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            {data.screens.map((screen) => (
-                                <div
-                                    key={screen.id}
-                                    className="flex items-center space-x-2 mb-2"
-                                >
-                                    <Checkbox
-                                        id={`screen-${screen.id}`}
-                                        checked={selectedScreens.includes(
-                                            screen.id
-                                        )}
-                                        onCheckedChange={() =>
-                                            handleScreenChange(screen.id)
-                                        }
-                                    />
-                                    <Label htmlFor={`screen-${screen.id}`}>
-                                        {screen.name}
-                                    </Label>
-                                </div>
-                            ))}
-                        </CardContent>
+                <Autocomplete
+                    multiple // Enable multi-select
+                    options={data.screens} // Pass the list of screens
+                    getOptionLabel={(option) => option.name} // Display the screen name
+                    value={data.screens.filter((screen) =>
+                        selectedScreens.includes(screen.id)
+                    )} // Filter selected screens
+                    onChange={(event, newValue) => {
+                        // Update the selected screens
+                        const selectedIds = newValue.map((screen) => screen.id);
+                        setSelectedScreens(selectedIds);
+                    }}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label="Select Screens"
+                            placeholder="Choose screens"
+                        />
+                    )}
+                />
+            </CardContent>
                     </Card>
 
                     <Card>
@@ -209,18 +241,23 @@ function CreateAd() {
                 </div>
 
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="pb-4 border-b">
                         <CardTitle>Start Advertising</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <CardContent className="pt-6">
+                        {/* Placeholder Images Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                             {getPlaceholderImages()}
                         </div>
 
+                        {/* Form Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Left Column */}
                             <div className="space-y-4">
                                 <div>
-                                    <Label htmlFor="title">Ad Title</Label>
+                                    <Label htmlFor="title" className="block mb-2 font-medium">
+                                        Ad Title
+                                    </Label>
                                     <Input
                                         id="title"
                                         value={adDetails.title}
@@ -230,23 +267,37 @@ function CreateAd() {
                                                 title: e.target.value,
                                             })
                                         }
+                                        className="w-full p-6 border rounded"
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="slot">Slot</Label>
-                                    <Input
-                                        id="slot"
+                                    <Label htmlFor="slot" className="block mb-2 font-medium">
+                                        Slot
+                                    </Label>
+                                    <Autocomplete
+                                        options={getSlotOptions()}
+                                        getOptionLabel={(option) => option}
                                         value={adDetails.slot}
-                                        onChange={(e) =>
+                                        onChange={(event, newValue) =>
                                             setAdDetails({
                                                 ...adDetails,
-                                                slot: e.target.value,
+                                                slot: newValue,
                                             })
                                         }
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Select Slot"
+                                                variant="outlined"
+                                                fullWidth
+                                            />
+                                        )}
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="duration">Duration</Label>
+                                    <Label htmlFor="duration" className="block mb-2 font-medium">
+                                        Duration (in seconds)
+                                    </Label>
                                     <Input
                                         id="duration"
                                         type="number"
@@ -257,16 +308,17 @@ function CreateAd() {
                                                 duration: e.target.value,
                                             })
                                         }
+                                        className="w-full p-2 border rounded"
                                     />
                                 </div>
                             </div>
+
+                            {/* Right Column */}
                             <div className="space-y-4">
                                 <div>
-                                    <Label>Start Date</Label>
+                                    <Label className="block mb-2 font-medium">Start Date</Label>
                                     <Popover>
-                                        <LocalizationProvider
-                                            dateAdapter={AdapterDayjs}
-                                        >
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
                                             <DateTimePicker
                                                 label="Start Date"
                                                 value={adDetails.startDate}
@@ -280,6 +332,7 @@ function CreateAd() {
                                                     <TextField
                                                         {...props}
                                                         fullWidth
+                                                        variant="outlined"
                                                     />
                                                 )}
                                             />
@@ -287,53 +340,57 @@ function CreateAd() {
                                     </Popover>
                                 </div>
                                 <div>
-                                    <Label>End Date</Label>
+                                    <Label className="block mb-2 font-medium">End Date</Label>
                                     <Popover>
                                         <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DateTimePicker
-                                            label="End Date"
-                                            value={adDetails.endDate}
-                                            onChange={(newDate) =>
-                                                setAdDetails({
-                                                    ...adDetails,
-                                                    endDate: newDate,
-                                                })
-                                            }
-                                            renderInput={(props) => (
-                                                <TextField
-                                                    {...props}
-                                                    fullWidth
-                                                />
-                                            )}
-                                        />
+                                            <DateTimePicker
+                                                label="End Date"
+                                                value={adDetails.endDate}
+                                                onChange={(newDate) =>
+                                                    setAdDetails({
+                                                        ...adDetails,
+                                                        endDate: newDate,
+                                                    })
+                                                }
+                                                renderInput={(props) => (
+                                                    <TextField
+                                                        {...props}
+                                                        fullWidth
+                                                        variant="outlined"
+                                                    />
+                                                )}
+                                            />
                                         </LocalizationProvider>
                                     </Popover>
                                 </div>
                                 <div>
-                                    <Label htmlFor="file">Upload File</Label>
+                                    <Label htmlFor="file" className="block mb-2 font-medium">
+                                        Upload File
+                                    </Label>
                                     <div className="mt-1">
                                         <Input
                                             id="file"
                                             type="file"
                                             accept="image/*,video/*"
-                                            onChange={(e) =>
-                                                handleFileUpload(
-                                                    e.target.files[0]
-                                                )
-                                            }
+                                            onChange={(e) => handleFileUpload(e.target.files[0])}
+                                            className="w-64 p-2 border rounded"
                                         />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <Button onClick={handleCreateAd} className="mt-6">
+                        {/* Create Ad Button */}
+                        <Button
+                            onClick={handleCreateAd}
+                            className="mt-8 w-full md:w-auto bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                        >
                             Create Ad
                         </Button>
                     </CardContent>
                 </Card>
             </div>
-        </>
+        </div>
     );
 }
 

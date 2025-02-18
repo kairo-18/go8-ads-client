@@ -81,6 +81,7 @@ function Availability() {
                         <div className="border-2 border-gray-300 rounded-sm p-5">
                             <p className="text-sm font-bold text-gray-900 mb-4">Screens</p>
                             <div className="flex flex-wrap items-center justify-between">
+                                {/* Dropdown for selecting the location */}
                                 <select
                                     className="border-3 border-blue-700 text-blue-700 rounded-sm p-2 w-1/5"
                                     value={selectedBuilding}
