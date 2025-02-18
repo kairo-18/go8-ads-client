@@ -157,7 +157,7 @@ function CreateAd() {
     return (
         <>
             <Sidebar />
-            <div className="container ml-[260px] pt-8 px-4">
+            <div className="container w-[80vw] ml-[280px] pt-18 px-4">
                 <h1 className="text-3xl font-bold mb-6">Ad Settings</h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
