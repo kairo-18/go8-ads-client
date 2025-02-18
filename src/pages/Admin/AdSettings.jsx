@@ -102,8 +102,7 @@ function AdSettings() {
                         </div>
                     </div>
                     {/* Create New Ad Button */}
-                    <div className="flex justify-center flex-col items-center border-top border-[#d9d9d9]">
-
+                    <div className="flex justify-center flex-col items-end border-top border-[#d9d9d9]">
                         
                         <button
                             className="bg-blue-500 text-white px-5 py-2 rounded-lg mt-5 w-[289px]"
@@ -111,13 +110,12 @@ function AdSettings() {
                         >
                             Create New Ad
                         </button>
-                        
+                    </div>
 
                         {/* Ads Table */}
-                        <div className="mt-6">
+                        <div className="mt-6 ">
                             <AdsTable ads={ads} screenId={selectedScreen} />
                         </div>
-                    </div>
                 </div>
             </div>
         </div>
