@@ -13,12 +13,12 @@ function AdminPreviews() {
     };
 
     return (
-        <div className="">
+        <div className="flex">
             <SideBar />
-            <div className="w-full h-screen p-10 bg-[#F2E9E9] overflow-auto">
-                <div className="ml-64 flex flex-col gap-1">
-                    <div className="flex justify-between items-center m-5">
-                        <h1 className="font-bold text-2xl">Previews</h1>
+            <div className="w-full h-screen p-10 bg-white overflow-auto">
+                <div className="ml-64 flex flex-col gap-1 ">
+                    <div className="flex justify-between items-start p-5">
+                        <h1 className="font-bold text-2xl pb-5">Previews</h1>
                         <ScreenCreate onScreenCreated={refreshScreens} />
                     </div>
                     <DashboardStats />

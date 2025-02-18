@@ -183,15 +183,14 @@ function CreateAd() {
     };
 
     return (
-        <div className="flex bg-[#F2E9E9] h-screen">
+        <div className="flex">
             {/* Sidebar */}
             <Sidebar />
-
-            {/* Main Content */}
-            <div className="flex-1 p-5 px-10 w-full max-w-[1300px] mx-auto md:ml-[255px] overflow-auto">
-                <h1 className="text-3xl font-bold mb-6 ">Ad Settings</h1>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="w-full h-screen p-10 bg-wgite">
+                <div className="ml-64 flex flex-col gap-1 ">
+                    <div className="flex justify-between flex-col items-start p-5">
+                        <h1 className="font-bold text-2xl pb-5">Ad Settings</h1>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3 w-full">
                     <Card>
                         <CardHeader>
                             <CardTitle>Screens</CardTitle>
@@ -241,156 +240,164 @@ function CreateAd() {
                 </div>
 
                 <Card>
-                    <CardHeader className="pb-4 border-b">
+                    <CardHeader className="pb-4 border-b flex flex-row justify-between items-center">
                         <CardTitle>Start Advertising</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                        {/* Placeholder Images Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                            {getPlaceholderImages()}
-                        </div>
-
-                        {/* Form Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Left Column */}
-                            <div className="space-y-4">
-                                <div>
-                                    <Label htmlFor="title" className="block mb-2 font-medium">
-                                        Ad Title
-                                    </Label>
-                                    <Input
-                                        id="title"
-                                        value={adDetails.title}
-                                        onChange={(e) =>
-                                            setAdDetails({
-                                                ...adDetails,
-                                                title: e.target.value,
-                                            })
-                                        }
-                                        className="w-full p-6 border rounded"
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="slot" className="block mb-2 font-medium">
-                                        Slot
-                                    </Label>
-                                    <Autocomplete
-                                        options={getSlotOptions()}
-                                        getOptionLabel={(option) => option}
-                                        value={adDetails.slot}
-                                        onChange={(event, newValue) =>
-                                            setAdDetails({
-                                                ...adDetails,
-                                                slot: newValue,
-                                            })
-                                        }
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Select Slot"
-                                                variant="outlined"
-                                                fullWidth
-                                            />
-                                        )}
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="duration" className="block mb-2 font-medium">
-                                        Duration (in seconds)
-                                    </Label>
-                                    <Input
-                                        id="duration"
-                                        type="number"
-                                        value={adDetails.duration}
-                                        onChange={(e) =>
-                                            setAdDetails({
-                                                ...adDetails,
-                                                duration: e.target.value,
-                                            })
-                                        }
-                                        className="w-full p-2 border rounded"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Right Column */}
-                            <div className="space-y-4">
-                                <div>
-                                    <Label className="block mb-2 font-medium">Start Date</Label>
-                                    <Popover>
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DateTimePicker
-                                                label="Start Date"
-                                                value={adDetails.startDate}
-                                                onChange={(newDate) =>
-                                                    setAdDetails({
-                                                        ...adDetails,
-                                                        startDate: newDate,
-                                                    })
-                                                }
-                                                renderInput={(props) => (
-                                                    <TextField
-                                                        {...props}
-                                                        fullWidth
-                                                        variant="outlined"
-                                                    />
-                                                )}
-                                            />
-                                        </LocalizationProvider>
-                                    </Popover>
-                                </div>
-                                <div>
-                                    <Label className="block mb-2 font-medium">End Date</Label>
-                                    <Popover>
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DateTimePicker
-                                                label="End Date"
-                                                value={adDetails.endDate}
-                                                onChange={(newDate) =>
-                                                    setAdDetails({
-                                                        ...adDetails,
-                                                        endDate: newDate,
-                                                    })
-                                                }
-                                                renderInput={(props) => (
-                                                    <TextField
-                                                        {...props}
-                                                        fullWidth
-                                                        variant="outlined"
-                                                    />
-                                                )}
-                                            />
-                                        </LocalizationProvider>
-                                    </Popover>
-                                </div>
-                                <div>
-                                    <Label htmlFor="file" className="block mb-2 font-medium">
-                                        Upload File
-                                    </Label>
-                                    <div className="mt-1">
-                                        <Input
-                                            id="file"
-                                            type="file"
-                                            accept="image/*,video/*"
-                                            onChange={(e) => handleFileUpload(e.target.files[0])}
-                                            className="w-64 p-2 border rounded"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         {/* Create Ad Button */}
                         <Button
                             onClick={handleCreateAd}
-                            className="mt-8 w-full md:w-auto bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                            className=" w-[100px] bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
                         >
                             Create Ad
                         </Button>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                        <div className="flex justify-between justify-reverse items-start xl:flex-row flex-col gap-10">
+
+                            {/* Form Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+                                {/* Left Column */}
+                                <div className="space-y-5.5">
+                                    <div>
+                                        <Label htmlFor="title" className="block mb-2 font-medium">
+                                            Add Title
+                                        </Label>
+                                        <Input
+                                            id="title"
+                                            value={adDetails.title}
+                                            onChange={(e) =>
+                                                setAdDetails({
+                                                    ...adDetails,
+                                                    title: e.target.value,
+                                                })
+                                            }
+                                            className="w-full p-6 border rounded"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="slot" className="block mb-2 font-medium">
+                                            Slot
+                                        </Label>
+                                        <Autocomplete
+                                            options={getSlotOptions()}
+                                            getOptionLabel={(option) => option}
+                                            value={adDetails.slot}
+                                            onChange={(event, newValue) =>
+                                                setAdDetails({
+                                                    ...adDetails,
+                                                    slot: newValue,
+                                                })
+                                            }
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    label="Select Slot"
+                                                    variant="outlined"
+                                                    fullWidth
+                                                />
+                                            )}
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="duration" className="block mb-2 font-medium">
+                                            Duration (in seconds)
+                                        </Label>
+                                        <Input
+                                            id="duration"
+                                            type="number"
+                                            value={adDetails.duration}
+                                            onChange={(e) =>
+                                                setAdDetails({
+                                                    ...adDetails,
+                                                    duration: e.target.value,
+                                                })
+                                            }
+                                            className="w-full p-2 border rounded"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Right Column */}
+                                <div className="space-y-4">
+                                    <div>
+                                        <Label className="block mb-2 font-medium">Start Date</Label>
+                                        <Popover>
+                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                <DateTimePicker
+                                                    label="Start Date"
+                                                    value={adDetails.startDate}
+                                                    onChange={(newDate) =>
+                                                        setAdDetails({
+                                                            ...adDetails,
+                                                            startDate: newDate,
+                                                        })
+                                                    }
+                                                    renderInput={(props) => (
+                                                        <TextField
+                                                            {...props}
+                                                            fullWidth
+                                                            variant="outlined"
+                                                        />
+                                                    )}
+                                                />
+                                            </LocalizationProvider>
+                                        </Popover>
+                                    </div>
+                                    <div>
+                                        <Label className="block mb-2 font-medium">End Date</Label>
+                                        <Popover>
+                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                <DateTimePicker
+                                                    label="End Date"
+                                                    value={adDetails.endDate}
+                                                    onChange={(newDate) =>
+                                                        setAdDetails({
+                                                            ...adDetails,
+                                                            endDate: newDate,
+                                                        })
+                                                    }
+                                                    renderInput={(props) => (
+                                                        <TextField
+                                                            {...props}
+                                                            fullWidth
+                                                            variant="outlined"
+                                                        />
+                                                    )}
+                                                />
+                                            </LocalizationProvider>
+                                        </Popover>
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="file" className="block mb-2 font-medium">
+                                            Upload File
+                                        </Label>
+                                        <div className="mt-1">
+                                            <Input
+                                                id="file"
+                                                type="file"
+                                                accept="image/*,video/*"
+                                                onChange={(e) => handleFileUpload(e.target.files[0])}
+                                                className="w-64 p-2 border rounded"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Placeholder Images Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-wrap mt-4">
+                                {getPlaceholderImages()}
+                            </div>
+                        </div>
+                        
+
+                        
                     </CardContent>
                 </Card>
             </div>
-        </div>
+                    </div>
+                </div>
+            </div>
+
+        
     );
 }
 

@@ -69,12 +69,13 @@ function Availability() {
     };
 
     return (
-        <div className="flex bg-[#F2E9E9] h-screen">
+        <div className="flex ">
             <SideBar />
-            <div className="flex-1 p-10 ml-64">
-                <div className="border-1 border-gray-300 rounded-sm">
-                    <h1 className="text-2xl font-bold p-5">Availability</h1>
-
+            <div className="w-full h-screen p-10 bg-wgite">
+                <div className="ml-64 flex flex-col gap-1">
+                    <div className="flex justify-between items-center p-5">
+                        <h1 className="font-bold text-2xl pb-5">Availability</h1>
+                    </div>
                     <DashboardStats />
 
                     <div className="rounded-sm p-5">
