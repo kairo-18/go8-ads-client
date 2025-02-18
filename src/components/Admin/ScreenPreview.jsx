@@ -35,7 +35,7 @@ function ScreenPreview({ screenRefreshTrigger }) {
     }, [screenRefreshTrigger]); // Re-fetch when the trigger changes
 
     return (
-        <div className="w-full h-full overflow-y-scroll border-1 rounded-sm p-5 mt-5">
+        <div className="w-full h-full border border-[#d9d9d9] rounded-sm p-5 mt-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                 {data.screens.map((screen, index) => (
                     <div key={index} className="w-full border rounded-lg p-2 bg-[#f9f6f5] shadow-md flex flex-col justify-center items-center overflow-hidden h-70">
