@@ -1,85 +1,92 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";  // Make sure AnimatePresence is imported
+import { motion, AnimatePresence } from "framer-motion";
 import FlightBoard from "./FlightBoard";
 import AnnouncementScreen from "../Announcement/AnnouncementScreen";
 import axiosInstance from "../../axios/axiosInstance";
-import io from "socket.io-client";
-import axios from "axios";
-
-// Assuming your server is running at localhost:3000
-const socket = io("http://localhost:3000"); // Connect to your WebSocket server
+import socket from "@/socket-config/socket";
+import defaultAdVertical from "../../assets/defaultAd/GO8 Default-Vertical.gif";
 
 function Res1({ screenId }) {
   const [isAds, toggleAds] = useState(false);
   const [ads, setAds] = useState([]);
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
-  const [announcements, setAnnouncements] = useState([]); // Store all received announcements
-  const [currentAnnouncement, setCurrentAnnouncement] = useState(null); // The latest announcement to show
-  const [isInitialFetchDone, setIsInitialFetchDone] = useState(false);
+  const [currentAnnouncement, setCurrentAnnouncement] = useState(null);
+  const [isAdSlidingOut, setIsAdSlidingOut] = useState(false);
+  const [isVerticalAdVisible, setIsVerticalAdVisible] = useState(false);
+  const [isAdVisible, setIsAdVisible] = useState(true);
 
-  // Fetching announcements and listening for new ones via WebSocket
   useEffect(() => {
     socket.on(`announcementToScreen-${screenId}`, (newAnnouncement) => {
-      console.log("New announcement received for screen:", newAnnouncement);
-      setAnnouncements([newAnnouncement]); // Only keep the latest announcement
-      setCurrentAnnouncement(newAnnouncement); // Show the latest announcement immediately
+      setCurrentAnnouncement(newAnnouncement);
     });
-
-    // Clean up WebSocket listener when the component unmounts
     return () => {
       socket.off(`announcementToScreen-${screenId}`);
     };
-  }, [screenId]); // Listen for events based on the current screenId
+  }, [screenId]);
 
-  // Deactivate the current announcement after its duration
   useEffect(() => {
     if (currentAnnouncement) {
       const timer = setTimeout(async () => {
         try {
-          // Deactivate the announcement after its specified duration
           await axiosInstance.patch(`http://localhost:3000/announcements/${currentAnnouncement.id}/deactivate`);
-          console.log(`✅ Announcement ${currentAnnouncement.id} set to inactive`);
         } catch (error) {
           console.error("Error deactivating announcement:", error);
         }
-
-        setCurrentAnnouncement(null); // Reset current announcement after duration
-      }, currentAnnouncement.duration * 1000); // Duration in seconds
-
-      // Clean up the timeout when the component unmounts or announcement changes
+        setCurrentAnnouncement(null);
+      }, currentAnnouncement.duration * 1000);
       return () => clearTimeout(timer);
     }
   }, [currentAnnouncement]);
 
-  // Fetching ads for the current screenId
   useEffect(() => {
     const fetchAds = async () => {
       try {
         const response = await axiosInstance.get(`http://localhost:3000/screens/${screenId}`);
         setAds(response.data.ads || []);
+        toggleAds(true);
       } catch (error) {
         console.error("Error fetching ads:", error);
       }
     };
-
     fetchAds();
+    const intervalId = setInterval(fetchAds, 60000);
+    return () => clearInterval(intervalId);
   }, [screenId]);
 
-  // Cycling through ads
   useEffect(() => {
     if (ads.length > 0) {
-      const interval = setInterval(() => {
-        toggleAds(false);
-        setTimeout(() => {
-          setCurrentAdIndex((prevIndex) => (prevIndex + 2) % ads.length);
-          toggleAds(true);
-        }, 5000); // Change ad every 5 seconds
-      }, 10000); // Change ad every 10 seconds
-      return () => clearInterval(interval);
-    }
-  }, [ads]);
+      const ad = ads[currentAdIndex];
+      const duration = ad?.duration || 5;
 
-  // If there is a current announcement, display it
+      // Resetting flags for smooth transitions
+      setIsAdVisible(true);
+      setIsVerticalAdVisible(false);
+      setIsAdSlidingOut(false);
+
+      const handleAdTransition = () => {
+        // Show the vertical ad after the current ad's duration
+        setTimeout(() => {
+          setIsAdVisible(false);
+          setIsVerticalAdVisible(true);
+
+          // Slide out the vertical ad and move to the next ad after 10 seconds
+          setTimeout(() => {
+            setIsVerticalAdVisible(false);
+            setIsAdSlidingOut(true);
+
+            // After the slide-out animation, show the main ad again
+            setTimeout(() => {
+              setIsAdVisible(true);
+              setIsAdSlidingOut(false); // Reset the sliding state
+            }, 1000); // Short delay before showing the main ad again
+          }, 5000); // Vertical ad stays for 5 seconds
+        }, duration * 1000); // Show the main ad for its duration
+      };
+
+      handleAdTransition();
+    }
+  }, [ads, currentAdIndex]);
+
   if (currentAnnouncement) {
     return <AnnouncementScreen announcement={currentAnnouncement} onComplete={() => setCurrentAnnouncement(null)} />;
   }
@@ -87,11 +94,22 @@ function Res1({ screenId }) {
   return (
     <div className="w-screen h-screen flex flex-col overflow-hidden relative">
       <div className="flex flex-row w-full h-full transition-all duration-500">
-        <div className={`transition-all duration-500 ${isAds ? "w-3/4" : "w-full"} h-full`}>
+        <div className={`transition-all duration-500 ${isAds && !isAdSlidingOut && isAdVisible ? "w-3/4" : "w-full"} h-full`}>
           <FlightBoard />
         </div>
         <AnimatePresence>
-          {isAds && ads.length > 0 && (
+          {isVerticalAdVisible && !isAdSlidingOut && (
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="ads w-1/4 bg-black text-white flex items-center justify-center"
+            >
+              <img src={defaultAdVertical} alt="Vertical Placeholder Ad" />
+            </motion.div>
+          )}
+          {isAds && !isAdSlidingOut && isAdVisible && ads.length > 0 && (
             <motion.div
               key={ads[currentAdIndex]?.id || currentAdIndex}
               initial={{ x: "100%" }}
@@ -100,11 +118,7 @@ function Res1({ screenId }) {
               transition={{ duration: 0.5, ease: "easeInOut" }}
               className="ads w-1/4 bg-black text-white flex items-center justify-center"
             >
-              <img
-                className="w-full h-full object-cover"
-                src={ads[currentAdIndex].mediaUrl}
-                alt="Ad"
-              />
+              <img className="w-full h-full object-cover" src={ads[currentAdIndex].mediaUrl} alt="Ad" />
             </motion.div>
           )}
         </AnimatePresence>
