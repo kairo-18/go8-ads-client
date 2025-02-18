@@ -65,54 +65,58 @@ function AdSettings() {
             <SideBar />
 
             {/* Main Content */}
-            <div className="flex-1 p-10 bg-[#F2E9E9] h-screen overflow-auto">
-                <div className="ml-64 border border-[#d9d9d9] rounded-sm p-5">
-                    <h1 className="text-2xl font-bold ">Ad Settings</h1>
+            <div className="flex-1 w-full h-screen p-10 bg-white overflow-auto">
+                <div className="ml-64 flex flex-col gap-1">
+                    <div className="flex justify-between flex-col items-start p-5">
+                        <h1 className="text-2xl font-bold ">Ad Settings</h1>
 
-                    {/* Screen & Status Section */}
-                    <div className="flex flex-wrap gap-10 md:gap-20 items-center">
-                        <div>
-                            <h3 className="font-bold text-sm pt-5 pb-2">Screens</h3>
-                            {/* Material UI screen dropdown */}
-                            <FormControl sx={{ minWidth: 300, "& .MuiOutlinedInput-root": { borderColor: "blue", "&:hover fieldset": { borderColor: "blue" }, "&.Mui-focused fieldset": { borderColor: "blue" } } }}>
-                                <InputLabel id="demo-simple-select-label">Screens</InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={selectedScreen}
-                                    onChange={(event) => showAdsOnScreen(event.target.value)}
-                                >
-                                    {data.screens.map((screen) => (
-                                        <MenuItem key={screen.id} value={screen.id}>
-                                            {screen.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                        {/* Screen & Status Section */}
+                        <div className="flex flex-wrap gap-10 md:gap-20 items-start">
+                            <div>
+                                <h3 className="font-bold text-sm pt-5 pb-2">Screens</h3>
+                                {/* Material UI screen dropdown */}
+                                <FormControl sx={{ minWidth: 300, "& .MuiOutlinedInput-root": { borderColor: "blue", "&:hover fieldset": { borderColor: "blue" }, "&.Mui-focused fieldset": { borderColor: "blue" } } }}>
+                                    <InputLabel id="demo-simple-select-label">Screens</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        value={selectedScreen}
+                                        onChange={(event) => showAdsOnScreen(event.target.value)}
+                                    >
+                                        {data.screens.map((screen) => (
+                                            <MenuItem key={screen.id} value={screen.id}>
+                                                {screen.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
 
-                        </div>
+                            </div>
 
-                        <div>
-                            <h3 className="font-bold text-sm mt-2">Status</h3>
-                            <p className="mt-3 text-red-500 text-lg">
-                                {ads.length > 0 ? `${ads.length} ads found.` : "Inactive (No active ads)."}
-                            </p>
+                            <div>
+                                <h3 className="font-bold text-sm mt-2">Status</h3>
+                                <p className="mt-3 text-red-500 text-lg">
+                                    {ads.length > 0 ? `${ads.length} ads found.` : "Inactive (No active ads)."}
+                                </p>
+                            </div>
                         </div>
                     </div>
-
                     {/* Create New Ad Button */}
-                    <hr className="mt-5" />
-                    <button
-                        className="bg-blue-500 text-white px-5 py-2 rounded-lg mt-5 w-full sm:w-auto"
-                        onClick={() => navigate("/admin/ad-setting/create-ad")}
-                    >
-                        Create New Ad
-                    </button>
-                    <hr className="mt-5" />
+                    <div className="flex justify-center flex-col items-center border-top border-[#d9d9d9]">
 
-                    {/* Ads Table */}
-                    <div className="mt-6">
-                        <AdsTable ads={ads} screenId={selectedScreen} />
+                        
+                        <button
+                            className="bg-blue-500 text-white px-5 py-2 rounded-lg mt-5 w-[289px]"
+                            onClick={() => navigate("/admin/ad-setting/create-ad")}
+                        >
+                            Create New Ad
+                        </button>
+                        
+
+                        {/* Ads Table */}
+                        <div className="mt-6">
+                            <AdsTable ads={ads} screenId={selectedScreen} />
+                        </div>
                     </div>
                 </div>
             </div>
