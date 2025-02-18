@@ -41,16 +41,13 @@ function Res3({ screenId }) {
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const response = await axiosInstance.get(`http://localhost:3000/screens/${screenId}`);
+        const response = await axios.get(`http://localhost:3000/screens/${screenId}`);
         setAds(response.data.ads || []);
-        toggleAds(true);
       } catch (error) {
         console.error("Error fetching ads:", error);
       }
     };
     fetchAds();
-    const intervalId = setInterval(fetchAds, 60000);
-    return () => clearInterval(intervalId);
   }, [screenId]);
 
   useEffect(() => {
