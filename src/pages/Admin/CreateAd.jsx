@@ -26,6 +26,8 @@ import {
     InputLabel,
     MenuItem,
     FormControl,
+    Autocomplete,
+    TextField,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../src/axios/axiosInstance";
@@ -154,6 +156,32 @@ function CreateAd() {
         ));
     };
 
+    const getSlotOptions = () => {
+        const layoutTypes = selectedScreens.flatMap((screenId) => {
+            const screen = data.screens.find(
+                (screen) => screen.id === screenId
+            );
+            return screen ? screen.layoutType : [];
+        });
+
+        const uniqueLayoutTypes = [...new Set(layoutTypes)];
+
+        if (uniqueLayoutTypes.length === 1) {
+            switch (uniqueLayoutTypes[0]) {
+                case "Res1":
+                    return ["Side"];
+                case "Res2":
+                    return ["Upper", "Lower"];
+                case "Res3":
+                    return ["Side", "Bottom"];
+                default:
+                    return [];
+            }
+        }
+
+        return [];
+    };
+
     return (
         <>
             <Sidebar />
@@ -234,15 +262,22 @@ function CreateAd() {
                                 </div>
                                 <div>
                                     <Label htmlFor="slot">Slot</Label>
-                                    <Input
-                                        id="slot"
+                                    <Autocomplete
+                                        options={getSlotOptions()}
+                                        getOptionLabel={(option) => option}
                                         value={adDetails.slot}
-                                        onChange={(e) =>
+                                        onChange={(event, newValue) =>
                                             setAdDetails({
                                                 ...adDetails,
-                                                slot: e.target.value,
+                                                slot: newValue,
                                             })
                                         }
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Select Slot"
+                                            />
+                                        )}
                                     />
                                 </div>
                                 <div>
@@ -289,23 +324,25 @@ function CreateAd() {
                                 <div>
                                     <Label>End Date</Label>
                                     <Popover>
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DateTimePicker
-                                            label="End Date"
-                                            value={adDetails.endDate}
-                                            onChange={(newDate) =>
-                                                setAdDetails({
-                                                    ...adDetails,
-                                                    endDate: newDate,
-                                                })
-                                            }
-                                            renderInput={(props) => (
-                                                <TextField
-                                                    {...props}
-                                                    fullWidth
-                                                />
-                                            )}
-                                        />
+                                        <LocalizationProvider
+                                            dateAdapter={AdapterDayjs}
+                                        >
+                                            <DateTimePicker
+                                                label="End Date"
+                                                value={adDetails.endDate}
+                                                onChange={(newDate) =>
+                                                    setAdDetails({
+                                                        ...adDetails,
+                                                        endDate: newDate,
+                                                    })
+                                                }
+                                                renderInput={(props) => (
+                                                    <TextField
+                                                        {...props}
+                                                        fullWidth
+                                                    />
+                                                )}
+                                            />
                                         </LocalizationProvider>
                                     </Popover>
                                 </div>
