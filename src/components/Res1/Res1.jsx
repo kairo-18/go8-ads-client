@@ -69,16 +69,22 @@ function Res1({ screenId }) {
           setIsAdVisible(false);
           setIsVerticalAdVisible(true);
 
-          // Slide out the vertical ad and move to the next ad after 10 seconds
+          // Slide out the vertical ad and move to the next ad after 5 seconds
           setTimeout(() => {
             setIsVerticalAdVisible(false);
             setIsAdSlidingOut(true);
 
-            // After the slide-out animation, show the main ad again
+            // Wait for 10 seconds after the vertical ad slides out
             setTimeout(() => {
-              setIsAdVisible(true);
-              setIsAdSlidingOut(false); // Reset the sliding state
-            }, 1000); // Short delay before showing the main ad again
+              setIsAdVisible(true); // Show the main ad again
+
+              // After the main ad stays visible for its duration, slide it out and move to the next ad
+              setTimeout(() => {
+                setIsAdSlidingOut(false); // Reset sliding state
+                setCurrentAdIndex((prevIndex) => (prevIndex + 1) % ads.length); // Move to next ad
+                handleAdTransition(); // Repeat the ad cycle
+              }, 1000); // Main ad stays visible for 1 second before transitioning
+            }, 10000); // Wait 10 seconds before sliding the main ad back in
           }, 5000); // Vertical ad stays for 5 seconds
         }, duration * 1000); // Show the main ad for its duration
       };

@@ -36,15 +36,14 @@ function Res2({ screenId }) {
     const fetchAds = async () => {
       try {
         const response = await axiosInstance.get(`http://localhost:3000/screens/${screenId}`);
+        console.log("Fetched ads:", response.data.ads);
         setAds(response.data.ads || []);
-        toggleAds(true);
       } catch (error) {
         console.error("Error fetching ads:", error);
       }
     };
+
     fetchAds();
-    const intervalId = setInterval(fetchAds, 60000);
-    return () => clearInterval(intervalId);
   }, [screenId]);
 
   // Set timers for ad expiration based on duration
