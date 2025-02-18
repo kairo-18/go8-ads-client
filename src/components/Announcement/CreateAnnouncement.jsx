@@ -87,102 +87,109 @@ const CreateAnnouncement = () => {
   };
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="lg">
       <Box sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
-        <Typography variant="h5" mb={2}>
-          Create Announcement
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="Title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label="Message"
-            name="message"
-            value={formData.message}
-            onChange={handleChange}
-            required
-            multiline
-            rows={3}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label="Flight Number"
-            name="flightNumber"
-            value={formData.flightNumber}
-            onChange={handleChange}
-            required
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label="Gate (Optional)"
-            name="gate"
-            value={formData.gate}
-            onChange={handleChange}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label="Duration (seconds)"
-            name="duration"
-            type="number"
-            value={formData.duration}
-            onChange={handleChange}
-            required
-            margin="normal"
-          />
-
-          {/* Screen Selection */}
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="screen-select-label">Select Screens</InputLabel>
-            <Select
-              labelId="screen-select-label"
-              multiple
-              value={formData.screenIds}
-              onChange={handleScreenChange}
-              name="screenIds"
-              renderValue={(selected) => selected.join(", ")}
-            >
-              {screens.map((screen) => (
-                <MenuItem key={screen.id} value={screen.id}>
-                  {screen.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Active Status Toggle */}
-          <FormControlLabel
-            control={
-              <Switch
-                checked={formData.active}
-                onChange={handleChange}
-                name="active"
+        <Typography variant="h5">
+            Create Announcement
+          </Typography>
+        <div className="text-[#282828] font-bold flex gap-5">
+          <div className="flex flex-col w-full">
+            <TextField
+              fullWidth
+              label="Title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+              margin="normal"
+            />
+            <TextField
+              fullWidth
+              label="Flight Number"
+              name="flightNumber"
+              value={formData.flightNumber}
+              onChange={handleChange}
+              required
+              margin="normal"
+            />
+            <TextField
+              fullWidth
+              label="Message"
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              required
+              multiline
+              rows={4.5}
+              margin="normal"
+            />
+            
+          </div>
+          <div className="flex flex-col w-full">
+            <TextField
+              fullWidth
+              label="Duration (seconds)"
+              name="duration"
+              type="number"
+              value={formData.duration}
+              onChange={handleChange}
+              required
+              margin="normal"
+            />
+            {/* Screen Selection */}
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="screen-select-label">Select Screens</InputLabel>
+              <Select
+                labelId="screen-select-label"
+                multiple
+                value={formData.screenIds}
+                onChange={handleScreenChange}
+                name="screenIds"
+                renderValue={(selected) => selected.join(", ")}
+              >
+                {screens.map((screen) => (
+                  <MenuItem key={screen.id} value={screen.id}>
+                    {screen.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              fullWidth
+              label="Gate (Optional)"
+              name="gate"
+              value={formData.gate}
+              onChange={handleChange}
+              margin="normal"
+            />
+            <div className="flex justify-between pt-10">
+              {/* Active Status Toggle */}
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.active}
+                    onChange={handleChange}
+                    name="active"
+                  />
+                }
+                label="Active"
               />
-            }
-            label="Active"
-          />
-
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 2 }}
-            disabled={loading}
-          >
-            {loading ? "Submitting..." : "Create Announcement"}
-          </Button>
-        </form>
+              <div className="w-64">
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  onClick={handleSubmit}
+                  disabled={loading}
+                >
+                  {loading ? "Submitting..." : "Create Announcement"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
       </Box>
     </Container>
   );

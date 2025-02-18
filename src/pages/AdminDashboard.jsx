@@ -101,7 +101,7 @@ export default function AdminDashboard() {
                                 className="-mt-1.5 text-center text-blue-500 underline"
                                 onClick={() => navigate(`/${screen.routeName}`)}
                             >
-                                {screen.name}
+                                {screen.name}   
                             </button>
                         </div>  
                     );
