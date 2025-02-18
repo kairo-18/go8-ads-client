@@ -146,7 +146,7 @@ function App() {
 
         {/* Kaycee's shit*/}
         <Route
-          path='/admin/scheduling'
+          path='/admin/availability'
           element={
             <PrivateRoute>
               <Availability />
