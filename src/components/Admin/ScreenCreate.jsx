@@ -36,7 +36,7 @@ const ScreenCreate = ({ onScreenCreated }) => {
                 ads: [],
             };
 
-            await axios.post('http://localhost:3000/api/screens', newScreen, {
+            await axios.post('/api/screens', newScreen, {
                 headers: { 'Content-Type': 'application/json' },
             });
 

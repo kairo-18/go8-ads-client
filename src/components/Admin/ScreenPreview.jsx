@@ -18,7 +18,7 @@ function ScreenPreview({ screenRefreshTrigger }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const screensResponse = await axiosInstance.get("http://localhost:3000/api/screens");
+                const screensResponse = await axiosInstance.get("/api/screens");
                 const allAds = screensResponse.data.flatMap((screen) => screen.ads || []);
 
                 setData({

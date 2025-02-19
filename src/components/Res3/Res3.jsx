@@ -27,7 +27,7 @@ function Res3({ screenId }) {
     if (currentAnnouncement) {
       const timer = setTimeout(async () => {
         try {
-          await axios.patch(`http://localhost:3000/api/announcements/${currentAnnouncement.id}/deactivate`);
+          await axios.patch(`/api/announcements/${currentAnnouncement.id}/deactivate`);
         } catch (error) {
           console.error("Error deactivating announcement:", error);
         }
@@ -41,7 +41,7 @@ function Res3({ screenId }) {
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/screens/${screenId}`);
+        const response = await axios.get(`/api/screens/${screenId}`);
         setAds(response.data.ads || []);
       } catch (error) {
         console.error("Error fetching ads:", error);

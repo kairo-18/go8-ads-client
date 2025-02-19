@@ -9,6 +9,15 @@ export default defineConfig({
     react(),
     taildwindcss(),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://152.42.176.184', // Change this to your API URL
+        changeOrigin: true,
+        secure: false,
+      }
+    }
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
