@@ -125,7 +125,7 @@ function CreateAd() {
         try {
             await Promise.all(
                 selectedScreens.map((screenId) =>
-                    axiosInstance.post(`/screens/${screenId}/ads`, adDetails)
+                    axiosInstance.post(`/api/screens/${screenId}/ads`, adDetails)
                 )
             );
             alert("Ad created successfully!");
