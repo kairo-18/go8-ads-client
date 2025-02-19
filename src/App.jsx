@@ -40,7 +40,7 @@ function App() {
   useEffect(() => {
     const fetchScreens = async () => {
       try {
-        const response = await axiosInstance.get("http://localhost:3000/screens");
+        const response = await axiosInstance.get("http://localhost:3000/api/screens");
         setScreens((prevScreens) => {
           const newScreens = response.data;
           if (JSON.stringify(prevScreens) !== JSON.stringify(newScreens)) {
