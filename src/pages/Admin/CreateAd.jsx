@@ -107,7 +107,7 @@ function CreateAd() {
         formData.append("ads", file);
 
         try {
-            const response = await axiosInstance.post("/ads-upload", formData);
+            const response = await axiosInstance.post("/api/ads-upload", formData);
             if (!response.data.fileUrl) throw new Error("File upload failed");
 
             setAdDetails((prevDetails) => ({
