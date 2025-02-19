@@ -28,7 +28,7 @@ function Res1({ screenId }) {
     if (currentAnnouncement) {
       const timer = setTimeout(async () => {
         try {
-          await axiosInstance.patch(`http://localhost:3000/announcements/${currentAnnouncement.id}/deactivate`);
+          await axiosInstance.patch(`http://localhost:3000/api/announcements/${currentAnnouncement.id}/deactivate`);
         } catch (error) {
           console.error("Error deactivating announcement:", error);
         }
@@ -41,7 +41,7 @@ function Res1({ screenId }) {
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const response = await axiosInstance.get(`http://localhost:3000/screens/${screenId}`);
+        const response = await axiosInstance.get(`http://localhost:3000/api/screens/${screenId}`);
         setAds(response.data.ads || []);
         toggleAds(true);
       } catch (error) {
