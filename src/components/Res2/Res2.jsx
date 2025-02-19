@@ -35,7 +35,7 @@ function Res2({ screenId }) {
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const response = await axiosInstance.get(`http://localhost:3000/api/screens/${screenId}`);
+        const response = await axiosInstance.get(`/api/screens/${screenId}`);
         console.log("Fetched ads:", response.data.ads);
         setAds(response.data.ads || []);
       } catch (error) {

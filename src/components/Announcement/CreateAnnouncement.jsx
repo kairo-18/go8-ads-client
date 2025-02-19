@@ -17,13 +17,13 @@ const CreateAnnouncement = () => {
 
   const [screens, setScreens] = useState([]);
   const [loading, setLoading] = useState(false);
-  const socket = io("http://localhost:3000");  // Connect to WebSocket server
+  const socket = io("/api");  // Connect to WebSocket server
 
   // Fetch available screens
   useEffect(() => {
     const fetchScreens = async () => {
       try {
-        const response = await axiosInstance.get("http://localhost:3000/screens");
+        const response = await axiosInstance.get("/api/screens");
         setScreens(response.data || []);
       } catch (error) {
         console.error("Error fetching screens:", error);

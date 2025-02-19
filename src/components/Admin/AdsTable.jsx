@@ -48,7 +48,7 @@ function AdsTable({ ads: initialAds, screenId }) {
 
         try {
             const response = await axiosInstance.post(
-                "http://localhost:3000/api/ads-upload",
+                "/api/ads-upload",
                 formData
             );
             if (!response.data.fileUrl) throw new Error("File upload failed");
@@ -59,7 +59,7 @@ function AdsTable({ ads: initialAds, screenId }) {
             };
 
             await axiosInstance.patch(
-                `http://localhost:3000/api/screens/${screenId}/ads/${selectedAd.id}`,
+                `/api/screens/${screenId}/ads/${selectedAd.id}`,
                 updatedAd
             );
 
@@ -77,7 +77,7 @@ function AdsTable({ ads: initialAds, screenId }) {
     const confirmDeleteAd = async () => {
         try {
             await axiosInstance.delete(
-                `http://localhost:3000/api/screens/${screenId}/ads/${selectedAd.id}`
+                `/api/screens/${screenId}/ads/${selectedAd.id}`
             );
 
             setLocalAds((prevAds) =>
@@ -94,7 +94,7 @@ function AdsTable({ ads: initialAds, screenId }) {
     const handleUpdateAdDetails = async () => {
         try {
             await axiosInstance.patch(
-                `http://localhost:3000/api/screens/${screenId}/ads/${selectedAd.id}`,
+                `/api/screens/${screenId}/ads/${selectedAd.id}`,
                 selectedAd
             );
 

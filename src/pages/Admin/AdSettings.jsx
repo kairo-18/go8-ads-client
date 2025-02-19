@@ -36,7 +36,7 @@ function AdSettings() {
         const fetchData = async () => {
             try {
                 const screensResponse = await axiosInstance.get(
-                    "http://localhost:3000/api/screens"
+                    "/api/screens"
                 );
 
                 // Extract ads from screens since there's no direct GET /ads route
