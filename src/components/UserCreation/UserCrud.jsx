@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import axiosInstance from "@/axios/axiosInstance";
 
 export default function UsersPage() {
@@ -10,7 +11,7 @@ export default function UsersPage() {
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [newUser, setNewUser] = useState({ username: "", password: "", role: "" });
+  const [newUser, setNewUser] = useState({ username: "", password: "", role: "admin" });
 
   useEffect(() => {
     fetchUsers();
@@ -22,6 +23,7 @@ export default function UsersPage() {
       setUsers(res.data);
     } catch (error) {
       console.error("Error fetching users:", error);
+      alert("Failed to fetch users.");
     }
   };
 
@@ -30,9 +32,11 @@ export default function UsersPage() {
       await axiosInstance.post("/api/users", newUser);
       fetchUsers();
       setOpen(false);
-      setNewUser({ username: "", password: "", role: "" });
+      setNewUser({ username: "", password: "", role: "admin" });
+      alert("User created successfully!");
     } catch (error) {
       console.error("Error creating user:", error);
+      alert("Failed to create user.");
     }
   };
 
@@ -43,22 +47,29 @@ export default function UsersPage() {
       setOpen(false);
       setEditMode(false);
       setSelectedUser(null);
+      alert("User updated successfully!");
     } catch (error) {
       console.error("Error updating user:", error);
+      alert("Failed to update user.");
     }
   };
 
   const handleDeleteUser = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+    if (!confirmDelete) return;
+
     try {
       await axiosInstance.delete(`/api/users/${id}`);
       fetchUsers();
+      alert("User deleted successfully!");
     } catch (error) {
       console.error("Error deleting user:", error);
+      alert("Failed to delete user.");
     }
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
         <Button 
@@ -129,13 +140,23 @@ export default function UsersPage() {
                 onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
               />
             )}
-            <Input
-              placeholder="Role"
-              value={editMode ? selectedUser?.role : newUser.role}
-              onChange={(e) => editMode 
-                ? setSelectedUser({ ...selectedUser, role: e.target.value }) 
-                : setNewUser({ ...newUser, role: e.target.value })}
-            />
+           <Select
+  value={editMode ? selectedUser?.role : newUser.role}
+  onValueChange={(value) => editMode 
+    ? setSelectedUser({ ...selectedUser, role: value }) 
+    : setNewUser({ ...newUser, role: value })}
+>
+  <SelectTrigger className="w-full border border-gray-300 rounded-md bg-white text-gray-700 focus:ring focus:ring-blue-200">
+    <SelectValue placeholder="Select a role" />
+  </SelectTrigger>
+  <SelectContent className="absolute z-50 bg-white border border-gray-300 shadow-lg rounded-md">
+    <SelectItem value="admin">admin</SelectItem>
+    <SelectItem value="tv1">tv1</SelectItem>
+    <SelectItem value="tv2">tv2</SelectItem>
+    <SelectItem value="tv3">tv3</SelectItem>
+  </SelectContent>
+</Select>
+
             <Button 
               className="w-full bg-green-600 hover:bg-green-700 text-white mt-2"
               onClick={editMode ? handleEditUser : handleCreateUser}
