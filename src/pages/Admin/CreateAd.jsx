@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,7 +8,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, Upload } from "lucide-react";
 import { format } from "date-fns";
-import Sidebar from "../SideBar";
 import { Autocomplete, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../src/axios/axiosInstance";
@@ -16,7 +15,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
-
+import TimeSlotModal from "@/components/Calendar/TimeSlotModal";
 import UploadLoading from "../../components/loading/UploadLoading";
 
 function CreateAd() {
@@ -29,8 +28,12 @@ function CreateAd() {
     const navigate = useNavigate();
 
     const [selectedScreens, setSelectedScreens] = useState([]);
-    const [ads, setAds] = useState([]); // Initialize as an empty array
-    const [uploading, setUploading] = useState();
+    const [ads, setAds] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
+    const [uploading, setUploading] = useState(false);
+    const [fileName, setFileName] = useState("");
+    const fileInputRef = useRef(null);
 
     const handleScreenChange = (screenId) => {
         setSelectedScreens((prevSelectedScreens) =>
@@ -73,7 +76,7 @@ function CreateAd() {
     });
 
     const handleFileUpload = async (file) => {
-        if (!file) return;
+        if (!file) return alert("Please select a file");
 
         setFileName(file.name); // Set filename before upload starts
         setUploading(true);
@@ -90,7 +93,7 @@ function CreateAd() {
                 mediaUrl: response.data.fileUrl,
             }));
 
-            setFileName((prevFileName) => prevFileName || file.name);
+            alert("File uploaded successfully!");
         } catch (error) {
             console.error("Error uploading file:", error);
         } finally {
@@ -117,31 +120,11 @@ function CreateAd() {
                     });
                 })
             );
-
             alert("Ad created successfully!");
-
-
-            setAdDetails({
-                title: "",
-                slot: "",
-                startDate: null,
-                endDate: null,
-                duration: "",
-                mediaUrl: "",
-            });
-
-
-            setFileName("");
-
-
-            if (fileInputRef.current) fileInputRef.current.value = "";
-
-            setSelectedScreens([]);
         } catch (error) {
             console.error("Error creating ad:", error);
         }
     };
-
 
     const getPlaceholderImages = () => {
         const layoutTypes = selectedScreens.flatMap((screenId) => {
@@ -333,45 +316,35 @@ function CreateAd() {
                                                     onClose={toggleModal}
                                                     onSave={handleTimeSlotSave}
                                                 />
-                                            </LocalizationProvider>
-                                        </Popover>
-                                    </div>
-                                    <div>
-                                        <Label className="block mb-2 font-medium">End Date</Label>
-                                        <Popover>
-                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                <DateTimePicker
-                                                    label="End Date"
-                                                    value={adDetails.endDate}
-                                                    onChange={(newDate) =>
-                                                        setAdDetails({
-                                                            ...adDetails,
-                                                            endDate: newDate,
-                                                        })
-                                                    }
-                                                    renderInput={(props) => (
-                                                        <TextField
-                                                            {...props}
-                                                            fullWidth
-                                                            variant="outlined"
-                                                        />
-                                                    )}
-                                                />
-                                            </LocalizationProvider>
-                                        </Popover>
-                                    </div>
-                                    <div>
-                                    <Label htmlFor="file" className="block mb-2 font-medium">Upload File</Label>
-    {uploading ? <UploadLoading /> : (
-        <Input
-            id="file"
-            type="file"
-            accept="image/*,video/*"
-            onChange={(e) => handleFileUpload(e.target.files[0])}
-            className="w-64 p-2 border rounded"
-            disabled={uploading}
-        />
-    )}
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="file" className="block mb-2 font-medium">
+                                                    Upload File
+                                                </Label>
+                                                <div className="relative w-64">
+                                                    <Input
+                                                        id="file"
+                                                        type="file"
+                                                        ref={fileInputRef}
+                                                        accept="image/*,video/*"
+                                                        onChange={(e) => handleFileUpload(e.target.files[0])}
+                                                        className="absolute opacity-0 w-full h-full cursor-pointer"
+                                                        disabled={uploading}
+                                                    />
+                                                    <div className="border rounded px-3 py-2 bg-white flex items-center justify-between cursor-pointer">
+                                                        {uploading ? (
+                                                            <div className="flex items-center gap-2">
+                                                                <UploadLoading />
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-gray-600 text-sm">
+                                                                {fileName ? `✅ ${fileName}` : "No file chosen"}
+                                                            </span>
+                                                        )}
+                                                        <Upload className="w-4 h-4 text-gray-500" />
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-wrap mt-4">
