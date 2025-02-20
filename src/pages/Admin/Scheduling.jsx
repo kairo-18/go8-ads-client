@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 function Scheduling() {
     return (
         <div className="">
-            <SideBar />
             <div className="w-full h-screen p-10 bg-gray-50">
                 <div className="ml-64">
                     <h1 className="font-bold text-2xl">Scheduling</h1>

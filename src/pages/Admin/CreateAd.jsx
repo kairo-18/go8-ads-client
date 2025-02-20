@@ -18,6 +18,8 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 import TimeSlotModal from "@/components/Calendar/TimeSlotModal";
 
+import UploadLoading from "../../components/loading/UploadLoading";
+
 function CreateAd() {
     const [data, setData] = useState({
         screens: [],
@@ -31,6 +33,7 @@ function CreateAd() {
     const [ads, setAds] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
+    const [uploading, setUploading] = useState(false);
 
     const handleScreenChange = (screenId) => {
         setSelectedScreens((prevSelectedScreens) =>
@@ -75,6 +78,8 @@ function CreateAd() {
     const handleFileUpload = async (file) => {
         if (!file) return alert("Please select a file");
 
+
+        setUploading(true);
         const formData = new FormData();
         formData.append("ads", file);
 
@@ -90,6 +95,8 @@ function CreateAd() {
             alert("File uploaded successfully!");
         } catch (error) {
             console.error("Error uploading file:", error);
+        } finally{
+            setUploading(false);
         }
     };
 
@@ -172,7 +179,6 @@ function CreateAd() {
 
     return (
         <div className="flex">
-            <Sidebar />
             <div className="w-full h-screen p-10 bg-wgite">
                 <div className="ml-64 flex flex-col gap-1 ">
                     <div className="flex justify-between flex-col items-start p-5">

@@ -43,7 +43,7 @@ function Res1({ screenId }) {
       try {
         const response = await axiosInstance.get(`/api/screens/${screenId}`);
         setAds(response.data.ads || []);
-        toggleAds(true);
+        toggleAds(response.data.ads && response.data.ads.length > 0);
       } catch (error) {
         console.error("Error fetching ads:", error);
       }
@@ -58,35 +58,30 @@ function Res1({ screenId }) {
       const ad = ads[currentAdIndex];
       const duration = ad?.duration || 5;
 
-      // Resetting flags for smooth transitions
       setIsAdVisible(true);
       setIsVerticalAdVisible(false);
       setIsAdSlidingOut(false);
 
       const handleAdTransition = () => {
-        // Show the vertical ad after the current ad's duration
         setTimeout(() => {
           setIsAdVisible(false);
           setIsVerticalAdVisible(true);
 
-          // Slide out the vertical ad and move to the next ad after 5 seconds
           setTimeout(() => {
             setIsVerticalAdVisible(false);
             setIsAdSlidingOut(true);
 
-            // Wait for 10 seconds after the vertical ad slides out
             setTimeout(() => {
-              setIsAdVisible(true); // Show the main ad again
+              setIsAdVisible(true);
 
-              // After the main ad stays visible for its duration, slide it out and move to the next ad
               setTimeout(() => {
-                setIsAdSlidingOut(false); // Reset sliding state
-                setCurrentAdIndex((prevIndex) => (prevIndex + 1) % ads.length); // Move to next ad
-                handleAdTransition(); // Repeat the ad cycle
-              }, 1000); // Main ad stays visible for 1 second before transitioning
-            }, 10000); // Wait 10 seconds before sliding the main ad back in
-          }, 5000); // Vertical ad stays for 5 seconds
-        }, duration * 1000); // Show the main ad for its duration
+                setIsAdSlidingOut(false);
+                setCurrentAdIndex((prevIndex) => (prevIndex + 1) % ads.length);
+                handleAdTransition();
+              }, 1000);
+            }, 10000);
+          }, 5000);
+        }, duration * 1000);
       };
 
       handleAdTransition();
@@ -104,28 +99,31 @@ function Res1({ screenId }) {
           <FlightBoard />
         </div>
         <AnimatePresence>
-          {isVerticalAdVisible && !isAdSlidingOut && (
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="ads w-1/4 bg-black text-white flex items-center justify-center"
-            >
-              <img src={defaultAdVertical} alt="Vertical Placeholder Ad" />
-            </motion.div>
-          )}
-          {isAds && !isAdSlidingOut && isAdVisible && ads.length > 0 && (
-            <motion.div
-              key={ads[currentAdIndex]?.id || currentAdIndex}
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="ads w-1/4 bg-black text-white flex items-center justify-center"
-            >
-              <img className="w-full h-full object-cover" src={ads[currentAdIndex].mediaUrl} alt="Ad" />
-            </motion.div>
+          {isAds && ads.length > 0 && (
+            isVerticalAdVisible && !isAdSlidingOut ? (
+              <motion.div
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="ads w-1/4 bg-black text-white flex items-center justify-center"
+              >
+                <img src={defaultAdVertical} alt="Vertical Placeholder Ad" />
+              </motion.div>
+            ) : (
+              isAdVisible && (
+                <motion.div
+                  key={ads[currentAdIndex]?.id || currentAdIndex}
+                  initial={{ x: "100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "100%" }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="ads w-1/4 bg-black text-white flex items-center justify-center"
+                >
+                  <img className="w-full h-full object-cover" src={ads[currentAdIndex].mediaUrl} alt="Ad" />
+                </motion.div>
+              )
+            )
           )}
         </AnimatePresence>
       </div>

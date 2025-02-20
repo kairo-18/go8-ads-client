@@ -31,8 +31,13 @@ const AdminLogin = () => {
         // Automatically set the Authorization header using the axios instance
         axiosInstance.defaults.headers["Authorization"] = `Bearer ${token}`;
 
+        if (response.data.userRole === "admin") {
+            navigate("/admin/dashboard");
+        }else{
+            navigate("/" + response.data.routeName);
+        }
+
       // Navigate to dashboard
-      navigate("/admin/dashboard");
     } catch (err) {
       setError("Invalid username or password");
     }

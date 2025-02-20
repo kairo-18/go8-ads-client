@@ -12,16 +12,30 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import axios from 'axios';
+import axiosInstance from '../../axios/axiosInstance';
 
 const ScreenCreate = ({ onScreenCreated }) => {
     const [formData, setFormData] = useState({
         name: '',
         routeName: '',
         layoutType: '',
+        userId: '', // Add userId to formData
     });
 
     const [isOpen, setIsOpen] = useState(false);
+    const [users, setUsers] = useState([]); // State to store users
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await axiosInstance.get('/api/users');
+                setUsers(response.data);
+            } catch (error) {
+                console.error('Error fetching users:', error);
+            }
+        };
+        fetchUsers();
+    }, []);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,12 +50,16 @@ const ScreenCreate = ({ onScreenCreated }) => {
                 ads: [],
             };
 
-            await axios.post('/api/screens', newScreen, {
+            const screenResponse = await axiosInstance.post('/api/screens', newScreen, {
                 headers: { 'Content-Type': 'application/json' },
             });
 
+            if (formData.userId) {
+                await axiosInstance.patch(`/api/screens/${screenResponse.data.id}/user/${formData.userId}`);
+            }
+
             alert('Screen created successfully!');
-            setFormData({ name: '', routeName: '', layoutType: '' });
+            setFormData({ name: '', routeName: '', layoutType: '', userId: '' });
             setIsOpen(false); // Close modal
 
             // Call the refresh function
@@ -55,9 +73,12 @@ const ScreenCreate = ({ onScreenCreated }) => {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button onClick={() => setIsOpen(true)}>Create Screen</Button>
+            <Button className="bg-black text-white hover:bg-gray-800" onClick={() => setIsOpen(true)}>
+    Create Screen
+</Button>
+
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="bg-white border border-gray-300 shadow-xl">
                 <DialogHeader>
                     <DialogTitle>Create Screen</DialogTitle>
                     <DialogDescription>
@@ -88,6 +109,26 @@ const ScreenCreate = ({ onScreenCreated }) => {
                                 <SelectItem value="Res1">Res1</SelectItem>
                                 <SelectItem value="Res2">Res2</SelectItem>
                                 <SelectItem value="Res3">Res3</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div>
+                        <Label htmlFor="userId">Assign User</Label>
+                        <Select
+                            id="userId"
+                            name="userId"
+                            value={formData.userId}
+                            onValueChange={(value) => setFormData({ ...formData, userId: value })}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a user" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {users.map((user) => (
+                                    <SelectItem key={user.id} value={user.id}>
+                                        {user.username}
+                                    </SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>

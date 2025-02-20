@@ -62,6 +62,7 @@ function AdsTable({ ads: initialAds, screenId }) {
                 `/api/screens/${screenId}/ads/${selectedAd.id}`,
                 updatedAd
             );
+            
 
             setLocalAds((prevAds) =>
                 prevAds.map((ad) => (ad.id === selectedAd.id ? updatedAd : ad))
@@ -77,7 +78,7 @@ function AdsTable({ ads: initialAds, screenId }) {
     const confirmDeleteAd = async () => {
         try {
             await axiosInstance.delete(
-                `/api/screens/${screenId}/ads/${selectedAd.id}`
+                `/api/screens/${screenId}/ads/${selectedAd.id} `
             );
 
             setLocalAds((prevAds) =>
@@ -190,13 +191,9 @@ function AdsTable({ ads: initialAds, screenId }) {
                                     <Edit className="w-4 h-4 mr-2" />
                                     Update
                                 </Button>
-                                <Button
-                                    variant="destructive"
-                                    onClick={() => handleDeleteAd(ad)}
-                                >
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    Terminate ad
-                                </Button>
+                                <Button className="bg-red-500 hover:bg-red-600 text-white" onClick={() => handleDeleteAd(ad)}>
+                                <Trash2 className="w-4 h-4 mr-2" /> Terminate ad
+                            </Button>
                             </div>
                         </div>
                     </div>
@@ -207,7 +204,7 @@ function AdsTable({ ads: initialAds, screenId }) {
                 open={isUploadModalOpen}
                 onOpenChange={setIsUploadModalOpen}
             >
-                <DialogContent>
+                <DialogContent className="bg-white p-6 rounded-lg shadow-xl">
                     <DialogHeader>
                         <DialogTitle>Upload New Asset</DialogTitle>
                     </DialogHeader>
@@ -237,7 +234,7 @@ function AdsTable({ ads: initialAds, screenId }) {
                 open={isDeleteModalOpen}
                 onOpenChange={setIsDeleteModalOpen}
             >
-                <DialogContent>
+                <DialogContent className="bg-white p-6 rounded-lg shadow-xl">
                     <DialogHeader>
                         <DialogTitle>Confirm Delete</DialogTitle>
                         <DialogDescription>
@@ -245,15 +242,12 @@ function AdsTable({ ads: initialAds, screenId }) {
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant="destructive" onClick={confirmDeleteAd}>
-                            Delete
-                        </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsDeleteModalOpen(false)}
-                        >
-                            Cancel
-                        </Button>
+                    <Button className="bg-red-500 hover:bg-red-600 text-white" onClick={confirmDeleteAd}>
+                        Delete
+                    </Button>
+                    <Button className="bg-gray-400 hover:bg-gray-500 text-white" onClick={() => setIsDeleteModalOpen(false)}>
+                        Cancel
+                    </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -262,7 +256,7 @@ function AdsTable({ ads: initialAds, screenId }) {
                 open={isUpdateModalOpen}
                 onOpenChange={setIsUpdateModalOpen}
             >
-                <DialogContent>
+              <DialogContent className="bg-white p-6 rounded-lg shadow-xl">
                     <DialogHeader>
                         <DialogTitle>Update Ad Details</DialogTitle>
                     </DialogHeader>
@@ -320,11 +314,8 @@ function AdsTable({ ads: initialAds, screenId }) {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button onClick={handleUpdateAdDetails}>Update</Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsUpdateModalOpen(false)}
-                        >
+                        <Button className="bg-black hover:bg-blue-600 text-white" onClick={handleUpdateAdDetails}>Update</Button>
+                        <Button className="bg-gray-400 hover:bg-gray-500 text-white" onClick={() => setIsUploadModalOpen(false)}>
                             Cancel
                         </Button>
                     </DialogFooter>
