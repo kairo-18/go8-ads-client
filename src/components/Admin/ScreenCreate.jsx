@@ -78,7 +78,7 @@ const ScreenCreate = ({ onScreenCreated }) => {
 </Button>
 
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="bg-white border border-gray-300 shadow-xl">
                 <DialogHeader>
                     <DialogTitle>Create Screen</DialogTitle>
                     <DialogDescription>
