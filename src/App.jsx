@@ -10,6 +10,7 @@ import CreateScreen from "./pages/CRUD/CreateScreen";
 import UpdateScreen from "./pages/CRUD/UpdateScreen";
 import CreateAnnouncement from "./components/Announcement/CreateAnnouncement";
 import CreateAd from "./pages/Admin/CreateAd";
+import AdminUserCrud from "../src/pages/Admin/AdminUserCrud"
 import axiosInstance from "./axios/axiosInstance";
 import { useEffect, useState } from "react";
 import Res1 from "./components/Res1/Res1";
@@ -75,6 +76,7 @@ function App() {
           <Route path="crud/update" element={<UpdateScreen />} />
           <Route path="crud/createAnnouncement" element={<CreateAnnouncement />} />
           <Route path="ad-setting/create-ad" element={<CreateAd />} />
+          <Route path="crud/users" element={<AdminUserCrud />} />
         </Route>
       </Routes>
     </Router>
