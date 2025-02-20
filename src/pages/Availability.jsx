@@ -1,12 +1,18 @@
-import React, { useState } from "react";
-import SideBar from "../pages/SideBar";
+import React, { useState, useEffect } from "react";
 import DashboardStats from "../components/Admin/DashboardStats";
 import { useNavigate } from "react-router-dom";
 import IconMonitor from "@mui/icons-material/Monitor";
+import Loading from "../components/loading/Loading";
 
 function Availability() {
     const navigate = useNavigate();
     const [selectedBuilding, setSelectedBuilding] = useState("screen1");
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setLoading(false), 1500);
+        return () => clearTimeout(timer);
+    }, []);
 
     const activeFullScreen = 20;
     const activeScreens = 10;
@@ -42,7 +48,6 @@ function Availability() {
         setSelectedBuilding(e.target.value);
     };
 
-    // Data for different buildings
     const buildingScreens = {
         screen1: [
             { state: "Active and Full (2/2)", title: "Screen 1", place: "Lobby" },
@@ -68,46 +73,50 @@ function Availability() {
         ]
     };
 
-    return (
-        <div className="flex ">
-            <SideBar />
-            <div className="w-full h-screen p-10 bg-wgite">
-                <div className="ml-64 flex flex-col gap-1">
-                    <div className="flex justify-between items-center p-5">
-                        <h1 className="font-bold text-2xl pb-5">Availability</h1>
-                    </div>
-                    <DashboardStats />
+    if (loading) {
+        return (
+            <div className="w-full h-screen flex justify-center items-center bg-white">
+                <Loading />
+            </div>
+        );
+    }
 
-                    <div className="rounded-sm p-5">
-                        <div className="border-2 border-gray-300 rounded-sm p-5">
-                            <p className="text-sm font-bold text-gray-900 mb-4">Screens</p>
-                            <div className="flex flex-wrap items-center justify-between">
-                                {/* Dropdown for selecting the location */}
-                                <select
-                                    className="border-3 border-blue-700 text-blue-700 rounded-sm p-2 w-1/5"
-                                    value={selectedBuilding}
-                                    onChange={handleBuildingChange}
-                                >
-                                    <option value="screen1">Building 1</option>
-                                    <option value="screen2">Building 2</option>
-                                    <option value="screen3">Building 3</option>
-                                </select>
-                                <div className="flex flex-wrap gap-4">
-                                    <p className="text-green-500 font-bold">Active and Full Screen: {activeFullScreen}</p>
-                                    <p className="text-blue-500 font-bold">Active Screens: {activeScreens}</p>
-                                    <p className="text-red-500 font-bold">Inactive Screens: {inactiveScreens}</p>
-                                </div>
+    return (
+        <div className="w-full h-screen p-10 bg-white">
+            <div className="flex flex-col gap-1">
+                <div className="flex justify-between items-center p-5">
+                    <h1 className="font-bold text-2xl pb-5">Availability</h1>
+                </div>
+                <DashboardStats />
+
+                <div className="rounded-sm p-5">
+                    <div className="border-2 border-gray-300 rounded-sm p-5">
+                        <p className="text-sm font-bold text-gray-900 mb-4">Screens</p>
+                        <div className="flex flex-wrap items-center justify-between">
+                            <select
+                                className="border-3 border-blue-700 text-blue-700 rounded-sm p-2 w-1/5"
+                                value={selectedBuilding}
+                                onChange={handleBuildingChange}
+                            >
+                                <option value="screen1">Building 1</option>
+                                <option value="screen2">Building 2</option>
+                                <option value="screen3">Building 3</option>
+                            </select>
+                            <div className="flex flex-wrap gap-4">
+                                <p className="text-green-500 font-bold">Active and Full Screen: {activeFullScreen}</p>
+                                <p className="text-blue-500 font-bold">Active Screens: {activeScreens}</p>
+                                <p className="text-red-500 font-bold">Inactive Screens: {inactiveScreens}</p>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 xl:grid-cols-5 border-2 border-gray-300 rounded-sm mt-2">
-                                {buildingScreens[selectedBuilding].map((screen, index) => (
-                                    <ScreenCard
-                                        key={index}
-                                        state={screen.state}
-                                        title={screen.title}
-                                        place={screen.place}
-                                    />
-                                ))}
-                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 xl:grid-cols-5 border-2 border-gray-300 rounded-sm mt-2">
+                            {buildingScreens[selectedBuilding].map((screen, index) => (
+                                <ScreenCard
+                                    key={index}
+                                    state={screen.state}
+                                    title={screen.title}
+                                    place={screen.place}
+                                />
+                            ))}
                         </div>
                     </div>
                 </div>
