@@ -2,39 +2,21 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, Upload } from "lucide-react";
 import { format } from "date-fns";
 import Sidebar from "../SideBar";
-import {
-    FormControlLabel,
-    FormGroup,
-    InputLabel,
-    MenuItem,
-    FormControl,
-    Autocomplete,
-    TextField,
-} from "@mui/material";
+import { Autocomplete, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../src/axios/axiosInstance";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
+import TimeSlotModal from "@/components/Calendar/TimeSlotModal";
 
 function CreateAd() {
     const [data, setData] = useState({
@@ -46,7 +28,9 @@ function CreateAd() {
     const navigate = useNavigate();
 
     const [selectedScreens, setSelectedScreens] = useState([]);
-    const [ads, setAds] = useState([]); // Initialize as an empty array
+    const [ads, setAds] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
 
     const handleScreenChange = (screenId) => {
         setSelectedScreens((prevSelectedScreens) =>
@@ -59,22 +43,12 @@ function CreateAd() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const screensResponse = await axiosInstance.get(
-                    "/api/screens"
-                );
-
-                // Extract ads from screens since there's no direct GET /ads route
-                const allAds = screensResponse.data.flatMap(
-                    (screen) => screen.ads || []
-                );
-
+                const screensResponse = await axiosInstance.get("/api/screens");
+                const allAds = screensResponse.data.flatMap((screen) => screen.ads || []);
                 setData({
                     screens: screensResponse.data,
                     ads: allAds,
-                    displayedAds: allAds.reduce(
-                        (acc, ad) => acc + (ad.displayCount || 0),
-                        0
-                    ),
+                    displayedAds: allAds.reduce((acc, ad) => acc + (ad.displayCount || 0), 0),
                 });
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -94,8 +68,6 @@ function CreateAd() {
     const [adDetails, setAdDetails] = useState({
         title: "",
         slot: "",
-        startDate: null,
-        endDate: null,
         duration: "",
         mediaUrl: "",
     });
@@ -122,11 +94,23 @@ function CreateAd() {
     };
 
     const handleCreateAd = async () => {
+        if (!adDetails.title || !adDetails.slot || !adDetails.duration || !adDetails.mediaUrl) {
+            return alert("Please fill all fields before creating an ad.");
+        }
+
         try {
             await Promise.all(
-                selectedScreens.map((screenId) =>
-                    axiosInstance.post(`/api/screens/${screenId}/ads`, adDetails)
-                )
+                selectedTimeSlots.map((timeSlot) => {
+                    const [startTime, endTime] = timeSlot.slot.split(" - ");
+                    const startDate = new Date(`${timeSlot.date}T${startTime}:00`);
+                    const endDate = new Date(`${timeSlot.date}T${endTime}:00`);
+
+                    return axiosInstance.post(`/api/screens/${selectedScreens[0]}/ads`, {
+                        ...adDetails,
+                        startDate,
+                        endDate,
+                    });
+                })
             );
             alert("Ad created successfully!");
         } catch (error) {
@@ -136,12 +120,8 @@ function CreateAd() {
 
     const getPlaceholderImages = () => {
         const layoutTypes = selectedScreens.flatMap((screenId) => {
-            const screen = data.screens.find(
-                (screen) => screen.id === screenId
-            );
-            return screen
-                ? [{ layoutType: screen.layoutType, name: screen.name }]
-                : [];
+            const screen = data.screens.find((screen) => screen.id === screenId);
+            return screen ? [{ layoutType: screen.layoutType, name: screen.name }] : [];
         });
         return layoutTypes.map((screen, index) => (
             <div key={index}>
@@ -158,9 +138,7 @@ function CreateAd() {
 
     const getSlotOptions = () => {
         const layoutTypes = selectedScreens.flatMap((screenId) => {
-            const screen = data.screens.find(
-                (screen) => screen.id === screenId
-            );
+            const screen = data.screens.find((screen) => screen.id === screenId);
             return screen ? screen.layoutType : [];
         });
 
@@ -182,222 +160,182 @@ function CreateAd() {
         return [];
     };
 
+    const toggleModal = () => setIsModalOpen((prev) => !prev);
+
+    const handleTimeSlotSave = (date, slots) => {
+        const formattedSlots = slots.map((slot) => ({
+            date: format(date, "yyyy-MM-dd"),
+            slot,
+        }));
+        setSelectedTimeSlots(formattedSlots);
+    };
+
     return (
         <div className="flex">
-            {/* Sidebar */}
             <Sidebar />
             <div className="w-full h-screen p-10 bg-wgite">
                 <div className="ml-64 flex flex-col gap-1 ">
                     <div className="flex justify-between flex-col items-start p-5">
                         <h1 className="font-bold text-2xl pb-5">Ad Settings</h1>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3 w-full">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Screens</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                <Autocomplete
-                    multiple // Enable multi-select
-                    options={data.screens} // Pass the list of screens
-                    getOptionLabel={(option) => option.name} // Display the screen name
-                    value={data.screens.filter((screen) =>
-                        selectedScreens.includes(screen.id)
-                    )} // Filter selected screens
-                    onChange={(event, newValue) => {
-                        // Update the selected screens
-                        const selectedIds = newValue.map((screen) => screen.id);
-                        setSelectedScreens(selectedIds);
-                    }}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            label="Select Screens"
-                            placeholder="Choose screens"
-                        />
-                    )}
-                />
-            </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Status</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p
-                                className={
-                                    ads.length > 0
-                                        ? "text-green-600"
-                                        : "text-red-600"
-                                }
-                            >
-                                {ads.length > 0
-                                    ? `${ads.length} ads found.`
-                                    : "Inactive (No active ads)."}
-                            </p>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <Card>
-                    <CardHeader className="pb-4 border-b flex flex-row justify-between items-center">
-                        <CardTitle>Start Advertising</CardTitle>
-                        {/* Create Ad Button */}
-                        <Button
-                            onClick={handleCreateAd}
-                            className=" w-[100px] bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-                        >
-                            Create Ad
-                        </Button>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                        <div className="flex justify-between justify-reverse items-start xl:flex-row flex-col gap-10">
-
-                            {/* Form Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
-                                {/* Left Column */}
-                                <div className="space-y-5.5">
-                                    <div>
-                                        <Label htmlFor="title" className="block mb-2 font-medium">
-                                            Add Title
-                                        </Label>
-                                        <Input
-                                            id="title"
-                                            value={adDetails.title}
-                                            onChange={(e) =>
-                                                setAdDetails({
-                                                    ...adDetails,
-                                                    title: e.target.value,
-                                                })
-                                            }
-                                            className="w-full p-6 border rounded"
-                                        />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="slot" className="block mb-2 font-medium">
-                                            Slot
-                                        </Label>
-                                        <Autocomplete
-                                            options={getSlotOptions()}
-                                            getOptionLabel={(option) => option}
-                                            value={adDetails.slot}
-                                            onChange={(event, newValue) =>
-                                                setAdDetails({
-                                                    ...adDetails,
-                                                    slot: newValue,
-                                                })
-                                            }
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    label="Select Slot"
-                                                    variant="outlined"
-                                                    fullWidth
-                                                />
-                                            )}
-                                        />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="duration" className="block mb-2 font-medium">
-                                            Duration (in seconds)
-                                        </Label>
-                                        <Input
-                                            id="duration"
-                                            type="number"
-                                            value={adDetails.duration}
-                                            onChange={(e) =>
-                                                setAdDetails({
-                                                    ...adDetails,
-                                                    duration: e.target.value,
-                                                })
-                                            }
-                                            className="w-full p-2 border rounded"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Right Column */}
-                                <div className="space-y-4">
-                                    <div>
-                                        <Label className="block mb-2 font-medium">Start Date</Label>
-                                        <Popover>
-                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                <DateTimePicker
-                                                    label="Start Date"
-                                                    value={adDetails.startDate}
-                                                    onChange={(newDate) =>
-                                                        setAdDetails({
-                                                            ...adDetails,
-                                                            startDate: newDate,
-                                                        })
-                                                    }
-                                                    renderInput={(props) => (
-                                                        <TextField
-                                                            {...props}
-                                                            fullWidth
-                                                            variant="outlined"
-                                                        />
-                                                    )}
-                                                />
-                                            </LocalizationProvider>
-                                        </Popover>
-                                    </div>
-                                    <div>
-                                        <Label className="block mb-2 font-medium">End Date</Label>
-                                        <Popover>
-                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                <DateTimePicker
-                                                    label="End Date"
-                                                    value={adDetails.endDate}
-                                                    onChange={(newDate) =>
-                                                        setAdDetails({
-                                                            ...adDetails,
-                                                            endDate: newDate,
-                                                        })
-                                                    }
-                                                    renderInput={(props) => (
-                                                        <TextField
-                                                            {...props}
-                                                            fullWidth
-                                                            variant="outlined"
-                                                        />
-                                                    )}
-                                                />
-                                            </LocalizationProvider>
-                                        </Popover>
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="file" className="block mb-2 font-medium">
-                                            Upload File
-                                        </Label>
-                                        <div className="mt-1">
-                                            <Input
-                                                id="file"
-                                                type="file"
-                                                accept="image/*,video/*"
-                                                onChange={(e) => handleFileUpload(e.target.files[0])}
-                                                className="w-64 p-2 border rounded"
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Screens</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <Autocomplete
+                                        multiple
+                                        options={data.screens}
+                                        getOptionLabel={(option) => option.name}
+                                        value={data.screens.filter((screen) =>
+                                            selectedScreens.includes(screen.id)
+                                        )}
+                                        onChange={(event, newValue) => {
+                                            const selectedIds = newValue.map((screen) => screen.id);
+                                            setSelectedScreens(selectedIds);
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Select Screens"
+                                                placeholder="Choose screens"
                                             />
+                                        )}
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Status</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p
+                                        className={
+                                            ads.length > 0
+                                                ? "text-green-600"
+                                                : "text-red-600"
+                                        }
+                                    >
+                                        {ads.length > 0
+                                            ? `${ads.length} ads found.`
+                                            : "Inactive (No active ads)."}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        <Card>
+                            <CardHeader className="pb-4 border-b flex flex-row justify-between items-center">
+                                <CardTitle>Start Advertising</CardTitle>
+                                <Button
+                                    onClick={handleCreateAd}
+                                    className=" w-[100px] bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+                                >
+                                    Create Ad
+                                </Button>
+                            </CardHeader>
+                            <CardContent className="pt-6">
+                                <div className="flex justify-between justify-reverse items-start xl:flex-row flex-col gap-10">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+                                        <div className="space-y-5.5">
+                                            <div>
+                                                <Label htmlFor="title" className="block mb-2 font-medium">
+                                                    Add Title
+                                                </Label>
+                                                <Input
+                                                    id="title"
+                                                    value={adDetails.title}
+                                                    onChange={(e) =>
+                                                        setAdDetails({
+                                                            ...adDetails,
+                                                            title: e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full p-6 border rounded"
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="slot" className="block mb-2 font-medium">
+                                                    Slot
+                                                </Label>
+                                                <Autocomplete
+                                                    options={getSlotOptions()}
+                                                    getOptionLabel={(option) => option}
+                                                    value={adDetails.slot}
+                                                    onChange={(event, newValue) =>
+                                                        setAdDetails({
+                                                            ...adDetails,
+                                                            slot: newValue,
+                                                        })
+                                                    }
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            label="Select Slot"
+                                                            variant="outlined"
+                                                            fullWidth
+                                                        />
+                                                    )}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="duration" className="block mb-2 font-medium">
+                                                    Duration (in seconds)
+                                                </Label>
+                                                <Input
+                                                    id="duration"
+                                                    type="number"
+                                                    value={adDetails.duration}
+                                                    onChange={(e) =>
+                                                        setAdDetails({
+                                                            ...adDetails,
+                                                            duration: e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full p-2 border rounded"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div>
+                                                <Label htmlFor="file" className="block mb-2 font-medium">
+                                                    Select Time Slots
+                                                </Label>
+                                                <Button onClick={toggleModal}> Selection Screen </Button>
+                                                <TimeSlotModal
+                                                    isOpen={isModalOpen}
+                                                    onClose={toggleModal}
+                                                    onSave={handleTimeSlotSave}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="file" className="block mb-2 font-medium">
+                                                    Upload File
+                                                </Label>
+                                                <div className="mt-1">
+                                                    <Input
+                                                        id="file"
+                                                        type="file"
+                                                        accept="image/*,video/*"
+                                                        onChange={(e) => handleFileUpload(e.target.files[0])}
+                                                        className="w-64 p-2 border rounded"
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-wrap mt-4">
+                                        {getPlaceholderImages()}
+                                    </div>
                                 </div>
-                            </div>
-                            {/* Placeholder Images Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-wrap mt-4">
-                                {getPlaceholderImages()}
-                            </div>
-                        </div>
-                        
-
-                        
-                    </CardContent>
-                </Card>
-            </div>
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
             </div>
-
-        
+        </div>
     );
 }
 
