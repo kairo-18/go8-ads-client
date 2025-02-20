@@ -35,7 +35,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
-
+import { useRef } from "react"; 
 import UploadLoading from "../../components/loading/UploadLoading";
 
 function CreateAd() {
@@ -50,6 +50,9 @@ function CreateAd() {
     const [selectedScreens, setSelectedScreens] = useState([]);
     const [ads, setAds] = useState([]); // Initialize as an empty array
     const [uploading, setUploading] = useState();
+    const [fileName, setFileName] = useState("");
+    const fileInputRef = useRef(null);
+
 
     const handleScreenChange = (screenId) => {
         setSelectedScreens((prevSelectedScreens) =>
@@ -104,26 +107,27 @@ function CreateAd() {
     });
 
     const handleFileUpload = async (file) => {
-        if (!file) return alert("Please select a file");
-
-
+        if (!file) return;
+    
+        setFileName(file.name); // Set filename before upload starts
         setUploading(true);
+    
         const formData = new FormData();
         formData.append("ads", file);
-
+    
         try {
             const response = await axiosInstance.post("/api/ads-upload", formData);
             if (!response.data.fileUrl) throw new Error("File upload failed");
-
+    
             setAdDetails((prevDetails) => ({
                 ...prevDetails,
                 mediaUrl: response.data.fileUrl,
             }));
-
-            alert("File uploaded successfully!");
+    
+            setFileName((prevFileName) => prevFileName || file.name); 
         } catch (error) {
             console.error("Error uploading file:", error);
-        } finally{
+        } finally {
             setUploading(false);
         }
     };
@@ -135,11 +139,31 @@ function CreateAd() {
                     axiosInstance.post(`/api/screens/${screenId}/ads`, adDetails)
                 )
             );
+    
             alert("Ad created successfully!");
+    
+    
+            setAdDetails({
+                title: "",
+                slot: "",
+                startDate: null,
+                endDate: null,
+                duration: "",
+                mediaUrl: "",
+            });
+    
+
+            setFileName("");
+    
+   
+            if (fileInputRef.current) fileInputRef.current.value = "";
+    
+            setSelectedScreens([]);
         } catch (error) {
             console.error("Error creating ad:", error);
         }
     };
+    
 
     const getPlaceholderImages = () => {
         const layoutTypes = selectedScreens.flatMap((screenId) => {
@@ -372,18 +396,33 @@ function CreateAd() {
                                         </Popover>
                                     </div>
                                     <div>
-                                    <Label htmlFor="file" className="block mb-2 font-medium">Upload File</Label>
-    {uploading ? <UploadLoading /> : (
-        <Input
-            id="file"
-            type="file"
-            accept="image/*,video/*"
-            onChange={(e) => handleFileUpload(e.target.files[0])}
-            className="w-64 p-2 border rounded"
-            disabled={uploading}
-        />
-    )}
-                                        </div>
+                                <Label htmlFor="file" className="block mb-2 font-medium">
+                                    Upload File
+                                </Label>
+                                <div className="relative w-64">
+                                    <Input
+                                        id="file"
+                                        type="file"
+                                        ref={fileInputRef}
+                                        accept="image/*,video/*"
+                                        onChange={(e) => handleFileUpload(e.target.files[0])}
+                                        className="absolute opacity-0 w-full h-full cursor-pointer"
+                                        disabled={uploading}
+                                    />
+                                    <div className="border rounded px-3 py-2 bg-white flex items-center justify-between cursor-pointer">
+                                        {uploading ? (
+                                            <div className="flex items-center gap-2">
+                                                <UploadLoading />
+                                            </div>
+                                        ) : (
+                                            <span className="text-gray-600 text-sm">
+                                                {fileName ? `✅ ${fileName}` : "No file chosen"}
+                                            </span>
+                                        )}
+                                        <Upload className="w-4 h-4 text-gray-500" />
+                                    </div>
+                                </div>
+                            </div>
                                     </div>
                                 </div>
                             </div>
