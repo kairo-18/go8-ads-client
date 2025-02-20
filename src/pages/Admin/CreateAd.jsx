@@ -36,6 +36,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 
+import UploadLoading from "../../components/loading/UploadLoading";
+
 function CreateAd() {
     const [data, setData] = useState({
         screens: [],
@@ -47,6 +49,7 @@ function CreateAd() {
 
     const [selectedScreens, setSelectedScreens] = useState([]);
     const [ads, setAds] = useState([]); // Initialize as an empty array
+    const [uploading, setUploading] = useState();
 
     const handleScreenChange = (screenId) => {
         setSelectedScreens((prevSelectedScreens) =>
@@ -103,6 +106,8 @@ function CreateAd() {
     const handleFileUpload = async (file) => {
         if (!file) return alert("Please select a file");
 
+
+        setUploading(true);
         const formData = new FormData();
         formData.append("ads", file);
 
@@ -118,6 +123,8 @@ function CreateAd() {
             alert("File uploaded successfully!");
         } catch (error) {
             console.error("Error uploading file:", error);
+        } finally{
+            setUploading(false);
         }
     };
 
@@ -184,8 +191,6 @@ function CreateAd() {
 
     return (
         <div className="flex">
-            {/* Sidebar */}
-            <Sidebar />
             <div className="w-full h-screen p-10 bg-wgite">
                 <div className="ml-64 flex flex-col gap-1 ">
                     <div className="flex justify-between flex-col items-start p-5">
@@ -367,17 +372,17 @@ function CreateAd() {
                                         </Popover>
                                     </div>
                                     <div>
-                                        <Label htmlFor="file" className="block mb-2 font-medium">
-                                            Upload File
-                                        </Label>
-                                        <div className="mt-1">
-                                            <Input
-                                                id="file"
-                                                type="file"
-                                                accept="image/*,video/*"
-                                                onChange={(e) => handleFileUpload(e.target.files[0])}
-                                                className="w-64 p-2 border rounded"
-                                            />
+                                    <Label htmlFor="file" className="block mb-2 font-medium">Upload File</Label>
+    {uploading ? <UploadLoading /> : (
+        <Input
+            id="file"
+            type="file"
+            accept="image/*,video/*"
+            onChange={(e) => handleFileUpload(e.target.files[0])}
+            className="w-64 p-2 border rounded"
+            disabled={uploading}
+        />
+    )}
                                         </div>
                                     </div>
                                 </div>
@@ -386,7 +391,6 @@ function CreateAd() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-wrap mt-4">
                                 {getPlaceholderImages()}
                             </div>
-                        </div>
                         
 
                         
