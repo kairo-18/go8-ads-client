@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { TextField, Button, Container, Typography, Box, FormControlLabel, Switch, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import axios from "axios";
 import axiosInstance from "../../axios/axiosInstance";
-import { io } from "socket.io-client";
+import socket from "../../socket-config/socket"
 
 const CreateAnnouncement = () => {
   const [formData, setFormData] = useState({
@@ -17,7 +17,7 @@ const CreateAnnouncement = () => {
 
   const [screens, setScreens] = useState([]);
   const [loading, setLoading] = useState(false);
-  const socket = io("/api");  // Connect to WebSocket server
+ 
 
   // Fetch available screens
   useEffect(() => {
