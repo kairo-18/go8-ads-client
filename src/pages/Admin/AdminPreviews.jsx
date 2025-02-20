@@ -40,13 +40,20 @@ function AdminPreviews() {
         }
     };
 
+    if (loading) {
+        return (
+            <div className="w-full h-screen flex justify-center items-center bg-white">
+                <Loading />
+            </div>
+        );
+    }
+
     return (
-        <div className="flex">
-            <SideBar />
-            <div className="w-full h-screen p-10 bg-white overflow-auto">
-                <div className="ml-64 flex flex-col gap-1 ">
-                    <div className="flex justify-between items-start p-5">
-                        <h1 className="font-bold text-2xl pb-5">Previews</h1>
+        <div className="w-full h-screen p-10 bg-white overflow-auto transition-all duration-300">
+            <div className="flex flex-col gap-1">
+                <div className="flex justify-between items-center p-5">
+                    <h1 className="font-bold text-2xl mb-1">Previews</h1> {/* Reduced margin-bottom */}
+                    <hr className="border-t-2 border-gray-400 w-full mx-5" />
                         <ScreenCreate onScreenCreated={refreshScreens} />
                         <ScreenDelete
                                 onConfirmDelete={handleConfirmDelete}
@@ -64,7 +71,6 @@ function AdminPreviews() {
                     </div>
                 </div>
             </div>
-        </div>
     );
 }
 

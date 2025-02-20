@@ -61,7 +61,6 @@ function AdSettings() {
             <div className="flex flex-col gap-1">
                 <div className="flex justify-between flex-col items-start p-5">
                     <h1 className="text-2xl font-bold">Ad Settings</h1>
-
                     {/* Screen & Status Section */}
                     <div className="flex flex-wrap gap-10 md:gap-20 items-start">
                         <div>

@@ -1,11 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DashboardStats from "../components/Admin/DashboardStats";
 import { useNavigate } from "react-router-dom";
 import IconMonitor from "@mui/icons-material/Monitor";
+import Loading from "../components/loading/Loading";
 
 function Availability() {
     const navigate = useNavigate();
     const [selectedBuilding, setSelectedBuilding] = useState("screen1");
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setLoading(false), 1500);
+        return () => clearTimeout(timer);
+    }, []);
 
     const activeFullScreen = 20;
     const activeScreens = 10;
@@ -41,7 +48,6 @@ function Availability() {
         setSelectedBuilding(e.target.value);
     };
 
-    // Data for different buildings
     const buildingScreens = {
         screen1: [
             { state: "Active and Full (2/2)", title: "Screen 1", place: "Lobby" },
@@ -67,6 +73,14 @@ function Availability() {
         ]
     };
 
+    if (loading) {
+        return (
+            <div className="w-full h-screen flex justify-center items-center bg-white">
+                <Loading />
+            </div>
+        );
+    }
+
     return (
         <div className="w-full h-screen p-10 bg-white">
             <div className="flex flex-col gap-1">
@@ -79,7 +93,6 @@ function Availability() {
                     <div className="border-2 border-gray-300 rounded-sm p-5">
                         <p className="text-sm font-bold text-gray-900 mb-4">Screens</p>
                         <div className="flex flex-wrap items-center justify-between">
-                            {/* Dropdown for selecting the location */}
                             <select
                                 className="border-3 border-blue-700 text-blue-700 rounded-sm p-2 w-1/5"
                                 value={selectedBuilding}
