@@ -16,7 +16,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
-import TimeSlotModal from "@/components/Calendar/TimeSlotModal";
 
 import UploadLoading from "../../components/loading/UploadLoading";
 
@@ -30,10 +29,8 @@ function CreateAd() {
     const navigate = useNavigate();
 
     const [selectedScreens, setSelectedScreens] = useState([]);
-    const [ads, setAds] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
-    const [uploading, setUploading] = useState(false);
+    const [ads, setAds] = useState([]); // Initialize as an empty array
+    const [uploading, setUploading] = useState();
 
     const handleScreenChange = (screenId) => {
         setSelectedScreens((prevSelectedScreens) =>
@@ -76,10 +73,11 @@ function CreateAd() {
     });
 
     const handleFileUpload = async (file) => {
-        if (!file) return alert("Please select a file");
+        if (!file) return;
 
-
+        setFileName(file.name); // Set filename before upload starts
         setUploading(true);
+
         const formData = new FormData();
         formData.append("ads", file);
 
@@ -92,10 +90,10 @@ function CreateAd() {
                 mediaUrl: response.data.fileUrl,
             }));
 
-            alert("File uploaded successfully!");
+            setFileName((prevFileName) => prevFileName || file.name);
         } catch (error) {
             console.error("Error uploading file:", error);
-        } finally{
+        } finally {
             setUploading(false);
         }
     };
@@ -119,11 +117,31 @@ function CreateAd() {
                     });
                 })
             );
+
             alert("Ad created successfully!");
+
+
+            setAdDetails({
+                title: "",
+                slot: "",
+                startDate: null,
+                endDate: null,
+                duration: "",
+                mediaUrl: "",
+            });
+
+
+            setFileName("");
+
+
+            if (fileInputRef.current) fileInputRef.current.value = "";
+
+            setSelectedScreens([]);
         } catch (error) {
             console.error("Error creating ad:", error);
         }
     };
+
 
     const getPlaceholderImages = () => {
         const layoutTypes = selectedScreens.flatMap((screenId) => {
@@ -315,21 +333,45 @@ function CreateAd() {
                                                     onClose={toggleModal}
                                                     onSave={handleTimeSlotSave}
                                                 />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor="file" className="block mb-2 font-medium">
-                                                    Upload File
-                                                </Label>
-                                                <div className="mt-1">
-                                                    <Input
-                                                        id="file"
-                                                        type="file"
-                                                        accept="image/*,video/*"
-                                                        onChange={(e) => handleFileUpload(e.target.files[0])}
-                                                        className="w-64 p-2 border rounded"
-                                                    />
-                                                </div>
-                                            </div>
+                                            </LocalizationProvider>
+                                        </Popover>
+                                    </div>
+                                    <div>
+                                        <Label className="block mb-2 font-medium">End Date</Label>
+                                        <Popover>
+                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                <DateTimePicker
+                                                    label="End Date"
+                                                    value={adDetails.endDate}
+                                                    onChange={(newDate) =>
+                                                        setAdDetails({
+                                                            ...adDetails,
+                                                            endDate: newDate,
+                                                        })
+                                                    }
+                                                    renderInput={(props) => (
+                                                        <TextField
+                                                            {...props}
+                                                            fullWidth
+                                                            variant="outlined"
+                                                        />
+                                                    )}
+                                                />
+                                            </LocalizationProvider>
+                                        </Popover>
+                                    </div>
+                                    <div>
+                                    <Label htmlFor="file" className="block mb-2 font-medium">Upload File</Label>
+    {uploading ? <UploadLoading /> : (
+        <Input
+            id="file"
+            type="file"
+            accept="image/*,video/*"
+            onChange={(e) => handleFileUpload(e.target.files[0])}
+            className="w-64 p-2 border rounded"
+            disabled={uploading}
+        />
+    )}
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-wrap mt-4">
