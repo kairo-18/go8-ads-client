@@ -17,6 +17,9 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 import TimeSlotModal from "@/components/Calendar/TimeSlotModal";
 import UploadLoading from "../../components/loading/UploadLoading";
+import res1 from "../../assets/adminPanel/Res1.png";
+import res2 from "../../assets/adminPanel/Res2.png";
+import res3 from "../../assets/adminPanel/Res3.png";
 
 function CreateAd() {
     const [data, setData] = useState({
@@ -134,7 +137,7 @@ function CreateAd() {
         return layoutTypes.map((screen, index) => (
             <div key={index}>
                 <img
-                    src={`https://placehold.co/400x300?text=${screen.layoutType}`}
+                    src={screen.layoutType === "Res1" ? res1 : screen.layoutType === "Res2" ? res2 : screen.layoutType === "Res3" ? res3 : ""}
                     alt={screen.layoutType}
                 />
                 <h2>
