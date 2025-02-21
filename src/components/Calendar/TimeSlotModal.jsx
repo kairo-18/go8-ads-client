@@ -5,12 +5,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 
-const TimeSlotModal = ({ isOpen, onClose, onSave }) => {
-    const [selectedDate, setSelectedDate] = useState(null);
+const TimeSlotModal = ({ isOpen, onClose, onSave, selectedDate, setSelectedDate, ads }) => {
     const [selectedSlots, setSelectedSlots] = useState([]);
 
     const handleDateSelect = (date) => {
-        setSelectedDate(date);
+        setSelectedDate(date); // Use setSelectedDate from props
         setSelectedSlots([]); // Reset slots when a new date is selected
     };
 
@@ -32,13 +31,46 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }) => {
         return slots;
     };
 
+    const isSlotOccupied = (slot) => {
+        if (!selectedDate) return false;
+
+        // Format the selected date as "yyyy-MM-dd"
+        const formattedDate = format(selectedDate, "yyyy-MM-dd");
+
+        // Check if any ad matches the selected date and slot
+        return ads.some(ad => {
+            // Parse the ad's start and end dates from the timestamp
+            const adStartDate = new Date(ad.startDate);
+            const adEndDate = new Date(ad.endDate);
+
+            // Debugging: Log the parsed dates to verify they are correct
+            console.log("Ad Start Date:", adStartDate);
+            console.log("Ad End Date:", adEndDate);
+
+            // Format the ad's date as "yyyy-MM-dd"
+            const adFormattedDate = format(adStartDate, "yyyy-MM-dd");
+
+            // Format the ad's time slot as "HH:mm - HH:mm"
+            const adStartTime = format(adStartDate, "HH:mm");
+            const adEndTime = format(adEndDate, "HH:mm");
+            const adSlot = `${adStartTime} - ${adEndTime}`;
+
+            // Debugging: Log the formatted date and slot for comparison
+            console.log("Ad Formatted Date:", adFormattedDate);
+            console.log("Ad Slot:", adSlot);
+
+            // Compare the date and slot
+            return adFormattedDate === formattedDate && adSlot === slot;
+        });
+    };
+
     const handleSave = () => {
         onSave(selectedDate, selectedSlots);
         onClose();
     };
 
     return (
-        <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center ${isOpen ? '' : 'hidden'}`}>
+        <div className={`fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center ${isOpen ? '' : 'hidden'}`}>
             <div className="bg-white p-6 rounded-lg w-11/12 max-w-2xl max-h-screen overflow-y-auto">
                 <h2 className="text-xl font-bold mb-4">Select Time Slots</h2>
                 <div className="flex flex-col gap-4">
@@ -49,7 +81,7 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }) => {
                                 {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
+                        <PopoverContent className="w-full p-0 bg-white shadow-lg rounded-lg">
                             <Calendar
                                 mode="single"
                                 selected={selectedDate}
@@ -65,6 +97,7 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }) => {
                                 key={index}
                                 variant={selectedSlots.includes(slot) ? "default" : "outline"}
                                 onClick={() => handleSlotSelect(slot)}
+                                disabled={!selectedDate || isSlotOccupied(slot)}
                             >
                                 {slot}
                             </Button>

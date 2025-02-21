@@ -26,7 +26,6 @@ function CreateAd() {
     });
 
     const navigate = useNavigate();
-
     const [selectedScreens, setSelectedScreens] = useState([]);
     const [ads, setAds] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,6 +33,7 @@ function CreateAd() {
     const [uploading, setUploading] = useState(false);
     const [fileName, setFileName] = useState("");
     const fileInputRef = useRef(null);
+    const [selectedDate, setSelectedDate] = useState(null);
 
     const handleScreenChange = (screenId) => {
         setSelectedScreens((prevSelectedScreens) =>
@@ -315,6 +315,9 @@ function CreateAd() {
                                                     isOpen={isModalOpen}
                                                     onClose={toggleModal}
                                                     onSave={handleTimeSlotSave}
+                                                    selectedDate={selectedDate}
+                                                    setSelectedDate={setSelectedDate}
+                                                    ads={ads}
                                                 />
                                             </div>
                                             <div>

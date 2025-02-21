@@ -25,6 +25,7 @@ function AdminPreviews() {
     const refreshScreens = () => {
         setLoading(true);
         setScreenRefreshTrigger((prev) => !prev);
+        setLoading(false);
     };
 
     const handleConfirmDelete = async () => {
