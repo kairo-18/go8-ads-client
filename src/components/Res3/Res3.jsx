@@ -51,40 +51,45 @@ function Res3({ screenId }) {
   }, [screenId]);
 
   useEffect(() => {
-    if (ads.length < 2) return;
-
+    if (ads.length === 0) {
+      setAdsVisible(false); // Completely hide ads if none exist
+      return;
+    }
+    if (ads.length < 2) return; // Existing check for too few ads
+  
     let verticalTimer, horizontalTimer, slideOutTimer, resetTimer;
-
+  
     setAdsVisible(true);
     setShowDefaultVertical(false);
     setShowDefaultHorizontal(false);
-
+  
     verticalTimer = setTimeout(() => {
       setShowDefaultVertical(true);
     }, 5000);
-
+  
     horizontalTimer = setTimeout(() => {
       setShowDefaultHorizontal(true);
     }, 10000);
-
+  
     slideOutTimer = setTimeout(() => {
       setAdsVisible(false); // Slide out ads
     }, 15000);
-
+  
     resetTimer = setTimeout(() => {
       setCycleCounter((prev) => prev + 1); // Force re-run of effect
     }, 25000); // Wait 10s before showing ads again
-
+  
     return () => {
       clearTimeout(verticalTimer);
       clearTimeout(horizontalTimer);
       clearTimeout(slideOutTimer);
       clearTimeout(resetTimer);
     };
-  }, [ads, cycleCounter]); // cycleCounter ensures this always resets properly
+  }, [ads, cycleCounter]);
+   // cycleCounter ensures this always resets properly
 
-  if (currentAnnouncement) {
-    return <AnnouncementScreen announcement={currentAnnouncement} />;
+  if (currentAnnouncement?.announcementType === "Screen Takeover") {
+    return <AnnouncementScreen announcement={currentAnnouncement} onComplete={() => setCurrentAnnouncement(null)} />;
   }
 
   return (
@@ -133,6 +138,16 @@ function Res3({ screenId }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {currentAnnouncement?.announcementType === "Marquee" && (
+  <div className="absolute bottom-0 left-0 w-full z-50">
+    <AnnouncementScreen
+      announcement={currentAnnouncement}
+      onComplete={() => setCurrentAnnouncement(null)}
+    />
+  </div>
+)}
+
     </div>
   );
 }

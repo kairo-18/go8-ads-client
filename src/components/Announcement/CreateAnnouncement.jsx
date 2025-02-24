@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { TextField, Button, Container, Typography, Box, FormControlLabel, Switch, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
-import axios from "axios";
+import { TextField, Button, Container, Typography, Box, FormControlLabel, Switch, MenuItem, Select, InputLabel, FormControl,  } from "@mui/material";
 import axiosInstance from "../../axios/axiosInstance";
 import socket from "../../socket-config/socket"
 
@@ -12,7 +11,8 @@ const CreateAnnouncement = () => {
     gate: "",
     duration: "",
     active: true,
-    screenIds: [], // Added screenIds to the form data
+    screenIds: [], 
+    announcementType:""// Added screenIds to the form data
   });
 
   const [screens, setScreens] = useState([]);
@@ -64,7 +64,8 @@ const CreateAnnouncement = () => {
         flightNumber: formData.flightNumber,
         gate: formData.gate,
         duration: formData.duration,
-        screenIds: formData.screenIds,  // Send screen IDs to WebSocket server
+        screenIds: formData.screenIds,
+        announcementType: formData.announcementType  // Send screen IDs to WebSocket server
       });
 
       alert("Announcement created successfully!");
@@ -76,7 +77,8 @@ const CreateAnnouncement = () => {
         gate: "",
         duration: "",
         active: true,
-        screenIds: [], // Reset screenIds
+        screenIds: [],
+        announcementType: "" // Reset screenIds
       });
     } catch (error) {
       console.error("Error creating announcement:", error);
@@ -123,8 +125,22 @@ const CreateAnnouncement = () => {
               rows={4.5}
               margin="normal"
             />
-            
+  
+          <FormControl fullWidth>
+      <InputLabel id="announcementType-label">Select the type of announcement</InputLabel>
+      <Select
+        labelId="announcementType-label"
+        id="announcementType"
+        name="announcementType"
+        value={formData.announcementType}
+        onChange={(event) => setFormData({ ...formData, announcementType: event.target.value })}
+      >
+        <MenuItem value="Screen Takeover">Screen Takeover</MenuItem>
+        <MenuItem value="Marquee">Marquee</MenuItem>
+      </Select>
+    </FormControl>
           </div>
+
           <div className="flex flex-col w-full">
             <TextField
               fullWidth

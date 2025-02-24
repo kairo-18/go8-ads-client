@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-function AnnouncementScreen({ announcement, onComplete }) {
+function Announcement({ announcement, onComplete }) {
   useEffect(() => {
     if (announcement) {
       const timer = setTimeout(() => {
-        onComplete?.(); // Call the onComplete function once the announcement duration ends
-      }, announcement.duration * 1000); // Duration in seconds
+        onComplete?.();
+      }, announcement.duration * 1000);
 
-      // Clean up the timer when the component is unmounted or announcement changes
       return () => clearTimeout(timer);
     }
   }, [announcement, onComplete]);
@@ -39,6 +38,48 @@ function AnnouncementScreen({ announcement, onComplete }) {
         )}
       </motion.div>
     </AnimatePresence>
+  );
+}
+
+function MarqueeAnnouncement({ announcement, onComplete }) {
+  const [isRunning, setIsRunning] = useState(true);
+
+  useEffect(() => {
+    if (announcement) {
+      const timer = setTimeout(() => {
+        setIsRunning(false);
+        onComplete?.();
+      }, announcement.duration * 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [announcement, onComplete]);
+
+  if (!announcement || !isRunning) return null;
+
+  return (
+    <div className="w-full bg-blue-900 text-yellow-300 py-4 overflow-hidden">
+      <motion.div
+        className="whitespace-nowrap text-3xl font-semibold"
+        initial={{ x: "100%" }}
+        animate={{ x: "-100%" }}
+        transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
+      >
+        {announcement.title?.toUpperCase()} - {announcement.message}
+        {announcement.flightNumber && ` ✈️ Flight: ${announcement.flightNumber}`}
+        {announcement.gate && ` 🛫 Gate: ${announcement.gate}`}
+      </motion.div>
+    </div>
+  );
+}
+
+function AnnouncementScreen({ announcement, onComplete }) {
+  if (!announcement) return null;
+
+  return announcement.announcementType === "Screen Takeover" ? (
+    <Announcement announcement={announcement} onComplete={onComplete} />
+  ) : (
+    <MarqueeAnnouncement announcement={announcement} onComplete={onComplete} />
   );
 }
 
