@@ -59,10 +59,15 @@ function AdSettings() {
     return (
         <div className="w-full h-screen p-10 bg-white overflow-auto">
             <div className="flex flex-col gap-1">
-                <div className="flex justify-between flex-col items-start p-5">
+                <div className="flex justify-between items-start p-5">
                     <h1 className="text-2xl font-bold">Ad Settings</h1>
-                    {/* Screen & Status Section */}
-                    <div className="flex flex-wrap gap-10 md:gap-20 items-start">
+                </div>
+
+                {/* Screen, Status, and Create New Ad Button Section */}
+                <div className="flex flex-wrap justify-between items-center p-5">
+                    {/* Screens and Status Sections */}
+                    <div className="flex flex-wrap gap-10 md:gap-20 items-center">
+                        {/* Screens Section */}
                         <div>
                             <h3 className="font-bold text-sm pt-5 pb-2">Screens</h3>
                             <FormControl sx={{ minWidth: 300, "& .MuiOutlinedInput-root": { borderColor: "blue", "&:hover fieldset": { borderColor: "blue" }, "&.Mui-focused fieldset": { borderColor: "blue" } } }}>
@@ -82,6 +87,7 @@ function AdSettings() {
                             </FormControl>
                         </div>
 
+                        {/* Status Section */}
                         <div>
                             <h3 className="font-bold text-sm mt-2">Status</h3>
                             <p className="mt-3 text-red-500 text-lg">
@@ -89,20 +95,20 @@ function AdSettings() {
                             </p>
                         </div>
                     </div>
-                </div>
 
-                {/* Create New Ad Button */}
-                <div className="flex justify-center flex-col items-end border-t border-[#d9d9d9]">
-                    <button
-                        className="bg-blue-500 text-white px-5 py-2 rounded-lg mt-5 w-[289px]"
-                        onClick={() => navigate("/admin/ad-setting/create-ad")}
-                    >
-                        Create New Ad
-                    </button>
+                    {/* Create New Ad Button */}
+                    <div className="flex items-center pt-5">
+                        <button
+                            className="bg-blue-500 text-white px-5 py-2 rounded-lg"
+                            onClick={() => navigate("/admin/ad-setting/create-ad")}
+                        >
+                            Create New Ad
+                        </button>
+                    </div>
                 </div>
 
                 {/* Ads Table */}
-                <div className="mt-6">
+                <div className="mt-6 border-t border-gray-200 pt-5">
                     <AdsTable ads={ads} screenId={selectedScreen} />
                 </div>
             </div>
