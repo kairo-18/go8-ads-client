@@ -73,10 +73,9 @@ const ScreenCreate = ({ onScreenCreated }) => {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-            <Button className="bg-black text-white hover:bg-gray-800" onClick={() => setIsOpen(true)}>
-    Create Screen
-</Button>
-
+                <Button className="bg-black text-white hover:bg-gray-800" onClick={() => setIsOpen(true)}>
+                    Create Screen
+                </Button>
             </DialogTrigger>
             <DialogContent className="bg-white border border-gray-300 shadow-xl">
                 <DialogHeader>
@@ -124,11 +123,13 @@ const ScreenCreate = ({ onScreenCreated }) => {
                                 <SelectValue placeholder="Select a user" />
                             </SelectTrigger>
                             <SelectContent>
-                                {users.map((user) => (
-                                    <SelectItem key={user.id} value={user.id}>
-                                        {user.username}
-                                    </SelectItem>
-                                ))}
+                                {users
+                                    .filter((user) => user.role !== 'admin')
+                                    .map((user) => (
+                                        <SelectItem key={user.id} value={user.id}>
+                                            {user.username}
+                                        </SelectItem>
+                                    ))}
                             </SelectContent>
                         </Select>
                     </div>
@@ -142,4 +143,3 @@ const ScreenCreate = ({ onScreenCreated }) => {
 };
 
 export default ScreenCreate;
-

@@ -31,7 +31,9 @@ function AdminPreviews() {
     const handleConfirmDelete = async () => {
         try {
             await Promise.all(
+
                 selectedScreens.map(screenId => axiosInstance.delete(`api/screens/${screenId}`))
+
             );
             refreshScreens();
             setIsDeleting(false);
