@@ -25,12 +25,15 @@ function AdminPreviews() {
     const refreshScreens = () => {
         setLoading(true);
         setScreenRefreshTrigger((prev) => !prev);
+        setLoading(false);
     };
 
     const handleConfirmDelete = async () => {
         try {
             await Promise.all(
-                selectedScreens.map(screenId => axiosInstance.delete(`/api/screens/${screenId}`))
+
+                selectedScreens.map(screenId => axiosInstance.delete(`api/screens/${screenId}`))
+
             );
             refreshScreens();
             setIsDeleting(false);

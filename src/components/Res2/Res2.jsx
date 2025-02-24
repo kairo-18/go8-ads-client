@@ -100,8 +100,9 @@ function Res2({ screenId }) {
   );
 
   // If there is an announcement, display it
-  if (announcement) {
-    return <AnnouncementScreen announcement={announcement} onComplete={() => setAnnouncement(null)} />;
+ 
+  if (announcement?.announcementType === "Screen Takeover") {
+    return <AnnouncementScreen announcement={announcement} onComplete={() => setAnnouncement(null)}/>;
   }
 
   return (
@@ -184,6 +185,12 @@ function Res2({ screenId }) {
           </motion.div>
         )}
       </AnimatePresence>
+      {announcement?.announcementType === "Marquee" && (
+      <div className="absolute bottom-0 w-full">
+        <AnnouncementScreen announcement={announcement} onComplete={() => setAnnouncement(null)} />
+      </div>
+    )}
+
     </div>
   );
 }
