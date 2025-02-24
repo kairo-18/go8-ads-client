@@ -88,9 +88,10 @@ function Res1({ screenId }) {
     }
   }, [ads, currentAdIndex]);
 
-  if (currentAnnouncement) {
+  if (currentAnnouncement?.announcementType === "Screen Takeover") {
     return <AnnouncementScreen announcement={currentAnnouncement} onComplete={() => setCurrentAnnouncement(null)} />;
   }
+  
 
   return (
     <div className="w-screen h-screen flex flex-col overflow-hidden relative">
@@ -127,10 +128,11 @@ function Res1({ screenId }) {
           )}
         </AnimatePresence>
       </div>
-      <div className="absolute bottom-0 w-full bg-blue-600 text-white text-sm flex justify-between px-4 py-2 border-t-4 border-blue-800">
-        <span>Updated {new Date().toLocaleTimeString()}</span>
-        <span>{new Date().toLocaleDateString()}</span>
-      </div>
+            {currentAnnouncement?.announcementType === "Marquee" && (
+        <div className="absolute bottom-0 w-full">
+          <AnnouncementScreen announcement={currentAnnouncement} onComplete={() => setCurrentAnnouncement(null)} />
+        </div>
+      )}
     </div>
   );
 }
