@@ -4,11 +4,11 @@ import axios from "axios";
 import { TextField, Button, Card } from "@mui/material";
 import logo from "./logo.png";
 import { useContext } from "react";
-import { UserContext } from "../context/UserContext"; // Import UserContext
+import { UserContext } from "../context/UserContext";
 import axiosInstance from "../axios/axiosInstance";
 
 const AdminLogin = () => {
-  const { login } = useContext(UserContext); // Access login function from context
+  const { login } = useContext(UserContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,28 +16,18 @@ const AdminLogin = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("/api/auth/login", {
-        username,
-        password,
-      });
+      const response = await axios.post("/api/auth/login", { username, password });
       console.log("Login successful", response.data);
-      
-        // On successful login, the backend will return the token
-        const token = response.data.access_token;
 
-        // Store the token in localStorage for future requests
-        localStorage.setItem("token", token);
-  
-        // Automatically set the Authorization header using the axios instance
-        axiosInstance.defaults.headers["Authorization"] = `Bearer ${token}`;
+      const token = response.data.access_token;
+      localStorage.setItem("token", token);
+      axiosInstance.defaults.headers["Authorization"] = `Bearer ${token}`;
 
-        if (response.data.userRole === "admin") {
-            navigate("/admin/dashboard");
-        }else{
-            navigate("/" + response.data.routeName);
-        }
-
-      // Navigate to dashboard
+      if (response.data.userRole === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/" + response.data.routeName);
+      }
     } catch (err) {
       setError("Invalid username or password");
     }
@@ -50,18 +40,22 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="h-screen flex items-center justify-end pr-24 bg-[#f9f3f2] relative">
-      {/* Left Color Stripes */}
-      <div className="absolute left-0 top-0 h-full w-12 bg-red-500"></div>
-      <div className="absolute left-16 top-0 h-full w-6 bg-blue-500"></div>
-      <div className="absolute left-28 top-0 h-full w-6 bg-yellow-500"></div>
+    <div className="h-screen flex flex-col sm:flex-row items-center sm:items-center justify-center sm:justify-end px-6 sm:pr-24 bg-[#f9f3f2] relative">
+      {/* Background Container for Stripes */}
+      <div className="absolute inset-0 flex">
+        <div className="h-full w-[10vw] min-w-[40px] bg-red-500"></div>
+        <div className="h-full w-[6vw] min-w-[30px] bg-blue-500"></div>
+        <div className="h-full w-[6vw] min-w-[30px] bg-yellow-500"></div>
+      </div>
 
-      {/* Login Box */}
-      <Card
-        className="p-8 shadow-md rounded-md border border-gray-400 w-11/12 sm:w-96"
-        sx={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
-      >
-        <h2 className="text-lg font-semibold mb-4">Log in</h2>
+      {/* Logo - Centered on Mobile, Top-Right on Desktop */}
+      <div className="absolute top-8 sm:top-10 sm:right-10 flex justify-center sm:justify-end w-full sm:w-auto">
+        <img src={logo} alt="AdSpace Logo" className="w-20 sm:w-32" />
+      </div>
+
+      {/* Login Box - Centered on Mobile, Right on Desktop */}
+      <Card className="p-8 shadow-md rounded-md border border-gray-400 w-full max-w-xs sm:max-w-md z-10 bg-white bg-opacity-90">
+        <h2 className="text-lg font-semibold mb-4 text-center sm:text-left">Log in</h2>
         {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
         <TextField
           fullWidth
@@ -85,11 +79,6 @@ const AdminLogin = () => {
           Log in
         </Button>
       </Card>
-
-      {/* Logo */}
-      <div className="absolute top-8 right-10">
-        <img src={logo} alt="AdSpace Logo" className="w-32" />
-      </div>
     </div>
   );
 };
