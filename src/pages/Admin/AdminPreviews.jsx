@@ -65,7 +65,7 @@ function AdminPreviews() {
                                 setSelectedScreens={setSelectedScreens}
                             />
                     </div>
-                    <DashboardStats />
+          
                     <div className="flex justify-between px-5">
                         <ScreenPreview screenRefreshTrigger={screenRefreshTrigger}
                         isDeleting={isDeleting}
