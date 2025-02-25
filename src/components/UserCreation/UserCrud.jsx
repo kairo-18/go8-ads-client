@@ -151,9 +151,7 @@ export default function UsersPage() {
   </SelectTrigger>
   <SelectContent className="absolute z-50 bg-white border border-gray-300 shadow-lg rounded-md">
     <SelectItem value="admin">admin</SelectItem>
-    <SelectItem value="tv1">tv1</SelectItem>
-    <SelectItem value="tv2">tv2</SelectItem>
-    <SelectItem value="tv3">tv3</SelectItem>
+    <SelectItem value="tv1">TV</SelectItem>
   </SelectContent>
 </Select>
 

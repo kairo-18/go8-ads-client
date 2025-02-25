@@ -13,6 +13,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import axiosInstance from '../../axios/axiosInstance';
+import Resolution1 from "../../assets/Resolutions/Res1.png"
+import Resolution2 from "../../assets/Resolutions/Res2.png"
+import Resolution3 from "../../assets/Resolutions/Res3.png"
+import Resolution4 from "../../assets/Resolutions/Res4.png"
 
 const ScreenCreate = ({ onScreenCreated }) => {
     const [formData, setFormData] = useState({
@@ -94,22 +98,65 @@ const ScreenCreate = ({ onScreenCreated }) => {
                         <Input id="routeName" name="routeName" value={formData.routeName} onChange={handleChange} />
                     </div>
                     <div>
-                        <Label htmlFor="layoutType">Layout Type</Label>
-                        <Select
-                            id="layoutType"
-                            name="layoutType"
-                            value={formData.layoutType}
-                            onValueChange={(value) => setFormData({ ...formData, layoutType: value })}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a layout type" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white">
-                                <SelectItem className="bg-white" value="Res1">Res1</SelectItem>
-                                <SelectItem  className="bg-white" value="Res2">Res2</SelectItem>
-                                <SelectItem  className="bg-white" value="Res3">Res3</SelectItem>
-                            </SelectContent>
-                        </Select>
+                    <Select
+                        id="layoutType"
+                        name="layoutType"
+                        value={formData.layoutType}
+                        onValueChange={(value) => setFormData({ ...formData, layoutType: value })}
+                    >
+                        {/* Select Trigger: Shows only text, but image appears on hover */}
+                        <SelectTrigger className="relative group">
+                            <SelectValue placeholder="Select a layout type">
+                                {formData.layoutType || "Select a layout type"}
+                            </SelectValue>
+                            {formData.layoutType && (
+                                <img 
+                                    src={
+                                        formData.layoutType === "Res1" ? Resolution1 :
+                                        formData.layoutType === "Res2" ? Resolution2 :
+                                        Resolution3
+                                    } 
+                                    alt={formData.layoutType} 
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 w-24 h-16 rounded-lg border shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                />
+                            )}
+                        </SelectTrigger>
+
+                        {/* Dropdown: Always show both text & images */}
+                        <SelectContent className="bg-white w-72">
+                        <SelectItem value="Res1">
+                            <div className="flex items-center space-x-3 p-3">
+                                <img src={Resolution1} alt="Res1" className="w-24 h-16 rounded-lg border shadow-md" />
+                                <div>
+                                    <span className="text-md font-medium">Res1</span>
+                                    <p className="text-sm text-gray-500">1 vertical ad slot</p>
+                                </div>
+                            </div>
+                        </SelectItem>
+                        <SelectItem value="Res2">
+                            <div className="flex items-center space-x-3 p-3">
+                                <img src={Resolution2} alt="Res2" className="w-24 h-16 rounded-lg border shadow-md" />
+                                <div>
+                                    <span className="text-md font-medium">Res2</span>
+                                    <p className="text-sm text-gray-500">2 square ad slots</p>
+                                </div>
+                            </div>
+                        </SelectItem>
+                        <SelectItem value="Res3">
+                            <div className="flex items-center space-x-3 p-3">
+                                <img src={Resolution3} alt="Res3" className="w-24 h-16 rounded-lg border shadow-md" />
+                                <div>
+                                    <span className="text-md font-medium">Res3</span>
+                                    <p className="text-sm text-gray-500">1 horizontal</p>
+                                    <p className="text-sm text-gray-500">1 vertical ad slot</p>
+                                </div>
+                            </div>
+                        </SelectItem>
+                    </SelectContent>
+                    </Select>
+
+
+
                     </div>
                     <div>
                         <Label htmlFor="userId">Assign User</Label>

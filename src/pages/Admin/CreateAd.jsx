@@ -123,7 +123,10 @@ function CreateAd() {
                     });
                 })
             );
+        
             alert("Ad created successfully!");
+            navigate("/admin/ad-setting");
+          
         } catch (error) {
             console.error("Error creating ad:", error);
         }
@@ -240,6 +243,7 @@ function CreateAd() {
                                 <CardTitle>Start Advertising</CardTitle>
                                 <Button
                                     onClick={handleCreateAd}
+                                    
                                     className=" w-[100px] bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
                                 >
                                     Create Ad
