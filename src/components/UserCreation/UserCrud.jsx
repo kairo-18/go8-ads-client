@@ -141,20 +141,19 @@ export default function UsersPage() {
               />
             )}
            <Select
-  value={editMode ? selectedUser?.role : newUser.role}
-  onValueChange={(value) => editMode 
-    ? setSelectedUser({ ...selectedUser, role: value }) 
-    : setNewUser({ ...newUser, role: value })}
->
-  <SelectTrigger className="w-full border border-gray-300 rounded-md bg-white text-gray-700 focus:ring focus:ring-blue-200">
-    <SelectValue placeholder="Select a role" />
-  </SelectTrigger>
-  <SelectContent className="absolute z-50 bg-white border border-gray-300 shadow-lg rounded-md">
-    <SelectItem value="admin">admin</SelectItem>
-    <SelectItem value="tv1">TV</SelectItem>
-  </SelectContent>
-</Select>
-
+          value={editMode ? selectedUser?.role : newUser.role}
+          onValueChange={(value) => editMode 
+            ? setSelectedUser({ ...selectedUser, role: value }) 
+            : setNewUser({ ...newUser, role: value })}
+        >
+          <SelectTrigger className="w-full border border-gray-300 rounded-md bg-white text-gray-700 focus:ring focus:ring-blue-200">
+            <SelectValue placeholder="Select a role" />
+          </SelectTrigger>
+          <SelectContent className="absolute z-50 bg-white border border-gray-300 shadow-lg rounded-md">
+            <SelectItem value="admin">admin</SelectItem>
+            <SelectItem value="tv1">TV</SelectItem>
+          </SelectContent>
+        </Select>
             <Button 
               className="w-full bg-green-600 hover:bg-green-700 text-white mt-2"
               onClick={editMode ? handleEditUser : handleCreateUser}
