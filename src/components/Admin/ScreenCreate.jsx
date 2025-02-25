@@ -104,10 +104,10 @@ const ScreenCreate = ({ onScreenCreated }) => {
                             <SelectTrigger>
                                 <SelectValue placeholder="Select a layout type" />
                             </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Res1">Res1</SelectItem>
-                                <SelectItem value="Res2">Res2</SelectItem>
-                                <SelectItem value="Res3">Res3</SelectItem>
+                            <SelectContent className="bg-white">
+                                <SelectItem className="bg-white" value="Res1">Res1</SelectItem>
+                                <SelectItem  className="bg-white" value="Res2">Res2</SelectItem>
+                                <SelectItem  className="bg-white" value="Res3">Res3</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
