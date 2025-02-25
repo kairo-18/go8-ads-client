@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import Res1 from "./components/Res1/Res1";
 import Res2 from "./components/Res2/Res2";
 import Res3 from "./components/Res3/Res3";
+import Res4 from "./components/Res4/Res4";
 
 // PrivateRoute component to protect admin routes
 const PrivateRoute = ({ children }) => {
@@ -50,6 +51,7 @@ function App() {
               screen.layoutType === "Res1" ? <Res1 screenId={screen.id} /> :
               screen.layoutType === "Res2" ? <Res2 screenId={screen.id} /> :
               screen.layoutType === "Res3" ? <Res3 screenId={screen.id} /> :
+              screen.layoutType === "Res4" ? <Res4 screenId={screen.id} /> :
               <Navigate to="/" />
             }
           />

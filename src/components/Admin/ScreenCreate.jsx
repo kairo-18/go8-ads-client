@@ -114,7 +114,8 @@ const ScreenCreate = ({ onScreenCreated }) => {
                                     src={
                                         formData.layoutType === "Res1" ? Resolution1 :
                                         formData.layoutType === "Res2" ? Resolution2 :
-                                        Resolution3
+                                        formData.layoutType === "Res3" ? Resolution3 :
+                                        Resolution4
                                     } 
                                     alt={formData.layoutType} 
                                     className="absolute right-3 top-1/2 transform -translate-y-1/2 w-24 h-16 rounded-lg border shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -147,6 +148,16 @@ const ScreenCreate = ({ onScreenCreated }) => {
                                 <img src={Resolution3} alt="Res3" className="w-24 h-16 rounded-lg border shadow-md" />
                                 <div>
                                     <span className="text-md font-medium">Res3</span>
+                                    <p className="text-sm text-gray-500">1 horizontal</p>
+                                    <p className="text-sm text-gray-500">1 vertical ad slot</p>
+                                </div>
+                            </div>
+                        </SelectItem>
+                        <SelectItem value="Res4">
+                            <div className="flex items-center space-x-3 p-3">
+                                <img src={Resolution3} alt="Res4" className="w-24 h-16 rounded-lg border shadow-md" />
+                                <div>
+                                    <span className="text-md font-medium">Res4</span>
                                     <p className="text-sm text-gray-500">1 horizontal</p>
                                     <p className="text-sm text-gray-500">1 vertical ad slot</p>
                                 </div>

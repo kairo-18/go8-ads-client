@@ -166,6 +166,8 @@ function CreateAd() {
                     return ["Upper", "Lower"];
                 case "Res3":
                     return ["Side", "Bottom"];
+                case "Res4":
+                    return ["Side", "Bottom"];
                 default:
                     return [];
             }
