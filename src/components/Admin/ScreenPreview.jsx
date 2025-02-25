@@ -6,7 +6,7 @@ import Res3 from "../Res3/Res3";
 import Res4 from "../Res4/Res4";
 import { useNavigate } from "react-router-dom";
 
-function ScreenPreview({ screenRefreshTrigger, isDeleting, selectedScreens, setSelectedScreens }) {
+function ScreenPreview({ screenRefreshTrigger, isDeleting, selectedScreens, setSelectedScreens, mutedVideo }) {
     const [data, setData] = useState({
         screens: [],
         ads: [],
@@ -69,7 +69,7 @@ function ScreenPreview({ screenRefreshTrigger, isDeleting, selectedScreens, setS
 
         return (
             <span className={`text-sm ${statusColor}`}>
-                {activeAds > 0 ? `Status: ${activeAds} out of ${totalAds} ads active` : "No active ads"}
+                {activeAds > 0 ? `Status: ${activeAds} out of ${totalAds} time slots taken` : "No active ads"}
             </span>
         );
     };
@@ -96,7 +96,7 @@ function ScreenPreview({ screenRefreshTrigger, isDeleting, selectedScreens, setS
                             ) : screen.layoutType === "Res3" ? (
                                 <Res3 screenId={screen.id} />
                             ) : screen.layoutType === "Res4" ? (
-                                <Res4 screenId={screen.id} />
+                                <Res4 screenId={screen.id} mutedVideo={mutedVideo} />
                             ) : null
                             }
                         </div>

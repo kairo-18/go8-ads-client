@@ -5,7 +5,7 @@ import defaultAdVertical from "../../assets/defaultAd/GO8 Default-Vertical.gif";
 import defaultVid from "../../assets/defaultAd/GO8 Default-Video.mp4"
 import defaultAdHorizontal from "../../assets/defaultAd/GO8 Default-Horizontal.gif"
 
-export default function Res4({ screenId }) {
+export default function Res4({ screenId, mutedVideo }) {
   const [bottomAds, setBottomAds] = useState([]);
   const [sideAds, setSideAds] = useState([]);
   const [showBottomAds, setShowBottomAds] = useState(true);
@@ -92,7 +92,7 @@ export default function Res4({ screenId }) {
         <div className={`w-${showSideAds ? '3/4' : 'full'} bg-white`}>
           {/* Div for video */}
           <div className={`h-${showBottomAds ? '3/4' : 'full'} bg-gray-500`}>
-            <video className="w-full h-full"  autoPlay loop>
+            <video className="w-full h-full"  autoPlay loop muted={mutedVideo}>
               <source src={defaultVid} type="video/mp4"/>
               Your browser does not support the video tag.
             </video>

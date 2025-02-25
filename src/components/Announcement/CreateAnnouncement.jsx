@@ -161,7 +161,11 @@ const CreateAnnouncement = () => {
                 value={formData.screenIds}
                 onChange={handleScreenChange}
                 name="screenIds"
-                renderValue={(selected) => selected.join(", ")}
+                renderValue={(selected) =>
+                  selected
+                    .map((id) => screens.find((screen) => screen.id === id)?.name || id)
+                    .join(", ")
+                }
               >
                 {screens.map((screen) => (
                   <MenuItem key={screen.id} value={screen.id}>
