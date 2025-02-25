@@ -6,7 +6,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import axiosInstance from "../../../src/axios/axiosInstance";
-import Loading from "../../components/loading/Loading"; // Ensure the correct path
+import Loading from "../../components/loading/Loading"; 
 
 function AdSettings() {
     const [data, setData] = useState({

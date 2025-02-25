@@ -31,12 +31,7 @@ function AdminPanel() {
                     <hr className="border-t-2 border-gray-400 flex-grow" />
                 </div>
                 <DashboardStats />
-                <div className="rounded-sm p-5">
-                    <h1 className="font-bold text-lg">Preview</h1>
-                    <div className="flex justify-between">
-                        <ScreenPreview />
-                    </div>
-                </div>
+               
             </div>
         </div>
     );

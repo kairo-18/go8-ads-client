@@ -3,6 +3,7 @@ import axiosInstance from "../../../src/axios/axiosInstance";
 import Res1 from "../Res1/Res1";
 import Res2 from "../Res2/Res2";
 import Res3 from "../Res3/Res3";
+import Res4 from "../Res4/Res4";
 import { useNavigate } from "react-router-dom";
 
 function ScreenPreview({ screenRefreshTrigger, isDeleting, selectedScreens, setSelectedScreens }) {
@@ -94,7 +95,10 @@ function ScreenPreview({ screenRefreshTrigger, isDeleting, selectedScreens, setS
                                 <Res2 screenId={screen.id} />
                             ) : screen.layoutType === "Res3" ? (
                                 <Res3 screenId={screen.id} />
-                            ) : null}
+                            ) : screen.layoutType === "Res4" ? (
+                                <Res4 screenId={screen.id} />
+                            ) : null
+                            }
                         </div>
                         <div className="flex justify-between items-center w-full px-2 -mt-5">
                             {calculateActiveAds(screen)}
