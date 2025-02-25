@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import axiosInstance from "../../axios/axiosInstance";
 import defaultAdVertical from "../../assets/defaultAd/GO8 Default-Vertical.gif";
+import defaultVid from "../../assets/defaultAd/GO8 Default-Video.mp4"
+import defaultAdHorizontal from "../../assets/defaultAd/GO8 Default-Horizontal.gif"
 
 export default function Res4({ screenId }) {
   const [bottomAds, setBottomAds] = useState([]);
@@ -47,17 +49,36 @@ export default function Res4({ screenId }) {
       }, 10000);
     };
 
-    const bottomAdIntervals = bottomAds.map(ad => {
-      return setInterval(() => {
-        toggleBottomAds();
-      }, ad.duration + 10000);
-    });
-
-    const sideAdIntervals = sideAds.map(ad => {
-      return setInterval(() => {
-        toggleSideAds();
-      }, ad.duration + 10000);
-    });
+    let bottomAdIntervals = [];
+    if (bottomAds.length > 0) {
+      bottomAdIntervals = bottomAds.map(ad =>
+        setInterval(() => {
+          toggleBottomAds();
+        }, ad.duration * 1000 + 10000)
+      );
+    } else {
+      bottomAdIntervals.push(
+        setInterval(() => {
+          toggleBottomAds();
+        }, 10000)
+      );
+    }
+    
+    let sideAdIntervals = [];
+    if (sideAds.length > 0) {
+      sideAdIntervals = sideAds.map(ad =>
+        setInterval(() => {
+          toggleSideAds();
+        }, 10000)
+      );
+    } else {
+      sideAdIntervals.push(
+        setInterval(() => {
+          toggleSideAds();
+        }, 10000)
+      );
+    }
+    
 
     return () => {
       bottomAdIntervals.forEach(clearInterval);
@@ -71,8 +92,8 @@ export default function Res4({ screenId }) {
         <div className={`w-${showSideAds ? '3/4' : 'full'} bg-white`}>
           {/* Div for video */}
           <div className={`h-${showBottomAds ? '3/4' : 'full'} bg-gray-500`}>
-            <video className="w-full h-full" controls>
-              <source src="your-video-file.mp4" type="video/mp4" />
+            <video className="w-full h-full"  autoPlay loop>
+              <source src={defaultVid} type="video/mp4"/>
               Your browser does not support the video tag.
             </video>
           </div>
@@ -93,7 +114,7 @@ export default function Res4({ screenId }) {
                 ))
               ) : (
                 <div className="w-full h-full">
-                  <img src={defaultAdVertical} alt="default ad" className="h-full w-full" />
+                  <img src={defaultAdHorizontal} alt="default ad" className="h-full w-full" />
                 </div>
               )}
             </motion.div>
