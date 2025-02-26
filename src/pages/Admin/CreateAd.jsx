@@ -37,14 +37,13 @@ function CreateAd() {
     const [fileName, setFileName] = useState("");
     const fileInputRef = useRef(null);
     const [selectedDate, setSelectedDate] = useState(null);
-
-    const handleScreenChange = (screenId) => {
-        setSelectedScreens((prevSelectedScreens) =>
-            prevSelectedScreens.includes(screenId)
-                ? prevSelectedScreens.filter((id) => id !== screenId)
-                : [...prevSelectedScreens, screenId]
-        );
-    };
+    const [layoutType, setLayoutType] = useState("Res1");
+    const [adDetails, setAdDetails] = useState({
+        title: "",
+        slot: "",
+        duration: "",
+        mediaUrl: "",
+    });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -70,13 +69,16 @@ function CreateAd() {
         setAds(selectedAds);
     }, [selectedScreens, data.screens]);
 
-    const [layoutType, setLayoutType] = useState("Res1");
-    const [adDetails, setAdDetails] = useState({
-        title: "",
-        slot: "",
-        duration: "",
-        mediaUrl: "",
-    });
+    useEffect(() => {
+        if (selectedScreens.length === 1) {
+            const selectedScreen = data.screens.find((screen) => screen.id === selectedScreens[0]);
+            if (selectedScreen) {
+                setLayoutType(selectedScreen.layoutType); // Update layoutType based on the selected screen
+            }
+        } else {
+            setLayoutType("Res1"); // Reset layoutType to default if no screen is selected
+        }
+    }, [selectedScreens, data.screens]);
 
     const handleFileUpload = async (file) => {
         if (!file) return alert("Please select a file");
@@ -109,12 +111,38 @@ function CreateAd() {
             return alert("Please fill all fields before creating an ad.");
         }
 
+        if (selectedScreens.length !== 1) {
+            return alert("Please select exactly one screen.");
+        }
+
         try {
             await Promise.all(
                 selectedTimeSlots.map((timeSlot) => {
                     const [startTime, endTime] = timeSlot.slot.split(" - ");
                     const startDate = new Date(`${timeSlot.date}T${startTime}:00`);
                     const endDate = new Date(`${timeSlot.date}T${endTime}:00`);
+
+                    // Check if the slot is already taken
+                    const isSlotTaken = ads.some(ad => {
+                        const adStartDate = new Date(ad.startDate);
+                        const adEndDate = new Date(ad.endDate);
+                        const adFormattedDate = format(adStartDate, "yyyy-MM-dd");
+                        const adSlot = `${format(adStartDate, "HH:mm")} - ${format(adEndDate, "HH:mm")}`;
+
+                        return (
+                            adFormattedDate === timeSlot.date &&
+                            adSlot === timeSlot.slot &&
+                            ad.slot === adDetails.slot
+                        );
+                    });
+
+                    if (isSlotTaken) {
+                        // Show an alert instead of throwing an error
+                        alert(`The ${adDetails.slot} slot is already taken for ${timeSlot.slot}. Please choose another slot.`);
+                        return; // Exit the function early
+                    }
+
+                    console.log(adDetails, startDate, endDate);
 
                     return axiosInstance.post(`/api/screens/${selectedScreens[0]}/ads`, {
                         ...adDetails,
@@ -123,51 +151,47 @@ function CreateAd() {
                     });
                 })
             );
-            alert("Ad created successfully!");
         } catch (error) {
             console.error("Error creating ad:", error);
         }
     };
 
     const getPlaceholderImages = () => {
-        const layoutTypes = selectedScreens.flatMap((screenId) => {
-            const screen = data.screens.find((screen) => screen.id === screenId);
-            return screen ? [{ layoutType: screen.layoutType, name: screen.name }] : [];
-        });
-        return layoutTypes.map((screen, index) => (
-            <div key={index}>
-                <img
-                    src={screen.layoutType === "Res1" ? res1 : screen.layoutType === "Res2" ? res2 : screen.layoutType === "Res3" ? res3 : ""}
-                    alt={screen.layoutType}
-                />
-                <h2>
-                    {screen.layoutType} - {screen.name}
-                </h2>
-            </div>
-        ));
+        if (selectedScreens.length === 1) {
+            const selectedScreen = data.screens.find((screen) => screen.id === selectedScreens[0]);
+            if (selectedScreen) {
+                return (
+                    <div>
+                        <img
+                            src={selectedScreen.layoutType === "Res1" ? res1 : selectedScreen.layoutType === "Res2" ? res2 : selectedScreen.layoutType === "Res3" ? res3 : ""}
+                            alt={selectedScreen.layoutType}
+                        />
+                        <h2>
+                            {selectedScreen.layoutType} - {selectedScreen.name}
+                        </h2>
+                    </div>
+                );
+            }
+        }
+        return null;
     };
 
     const getSlotOptions = () => {
-        const layoutTypes = selectedScreens.flatMap((screenId) => {
-            const screen = data.screens.find((screen) => screen.id === screenId);
-            return screen ? screen.layoutType : [];
-        });
-
-        const uniqueLayoutTypes = [...new Set(layoutTypes)];
-
-        if (uniqueLayoutTypes.length === 1) {
-            switch (uniqueLayoutTypes[0]) {
-                case "Res1":
-                    return ["Side"];
-                case "Res2":
-                    return ["Upper", "Lower"];
-                case "Res3":
-                    return ["Side", "Bottom"];
-                default:
-                    return [];
+        if (selectedScreens.length === 1) {
+            const selectedScreen = data.screens.find((screen) => screen.id === selectedScreens[0]);
+            if (selectedScreen) {
+                switch (selectedScreen.layoutType) {
+                    case "Res1":
+                        return ["Side"];
+                    case "Res2":
+                        return ["Upper", "Lower"];
+                    case "Res3":
+                        return ["Side", "Bottom"];
+                    default:
+                        return [];
+                }
             }
         }
-
         return [];
     };
 
@@ -194,21 +218,21 @@ function CreateAd() {
                                 </CardHeader>
                                 <CardContent>
                                     <Autocomplete
-                                        multiple
                                         options={data.screens}
                                         getOptionLabel={(option) => option.name}
-                                        value={data.screens.filter((screen) =>
-                                            selectedScreens.includes(screen.id)
-                                        )}
+                                        value={data.screens.find((screen) => selectedScreens.includes(screen.id)) || null}
                                         onChange={(event, newValue) => {
-                                            const selectedIds = newValue.map((screen) => screen.id);
-                                            setSelectedScreens(selectedIds);
+                                            if (newValue) {
+                                                setSelectedScreens([newValue.id]); // Set only one screen ID
+                                            } else {
+                                                setSelectedScreens([]); // Clear selection if no screen is selected
+                                            }
                                         }}
                                         renderInput={(params) => (
                                             <TextField
                                                 {...params}
-                                                label="Select Screens"
-                                                placeholder="Choose screens"
+                                                label="Select Screen"
+                                                placeholder="Choose a screen"
                                             />
                                         )}
                                     />
@@ -321,6 +345,8 @@ function CreateAd() {
                                                     selectedDate={selectedDate}
                                                     setSelectedDate={setSelectedDate}
                                                     ads={ads}
+                                                    selectedScreens={selectedScreens}
+                                                    layoutType={layoutType}
                                                 />
                                             </div>
                                             <div>
