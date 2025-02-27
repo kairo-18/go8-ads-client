@@ -17,9 +17,10 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 import TimeSlotModal from "@/components/Calendar/TimeSlotModal";
 import UploadLoading from "../../components/loading/UploadLoading";
-import res1 from "../../assets/adminPanel/Res1.png";
-import res2 from "../../assets/adminPanel/Res2.png";
-import res3 from "../../assets/adminPanel/Res3.png";
+import res1 from "../../assets/Resolutions/Res1.png";
+import res2 from "../../assets/Resolutions/Res2.png";
+import res3 from "../../assets/Resolutions/Res3.png";
+import res4 from "../../assets/Resolutions/Res4.png"
 
 function CreateAd() {
     const [data, setData] = useState({
@@ -140,7 +141,12 @@ function CreateAd() {
         return layoutTypes.map((screen, index) => (
             <div key={index}>
                 <img
-                    src={screen.layoutType === "Res1" ? res1 : screen.layoutType === "Res2" ? res2 : screen.layoutType === "Res3" ? res3 : ""}
+                   src={
+                    screen.layoutType === "Res1" ? res1 :
+                    screen.layoutType === "Res2" ? res2 :
+                    screen.layoutType === "Res3" ? res3 :
+                    screen.layoutType === "Res4" ? res4 : ""
+                }
                     alt={screen.layoutType}
                 />
                 <h2>
@@ -167,7 +173,7 @@ function CreateAd() {
                 case "Res3":
                     return ["Side", "Bottom"];
                 case "Res4":
-                    return ["Side", "Bottom"];
+                    return ["Side", "Bottom","Middle"];
                 default:
                     return [];
             }
