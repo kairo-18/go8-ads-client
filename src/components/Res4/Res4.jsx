@@ -4,6 +4,8 @@ import axiosInstance from "../../axios/axiosInstance";
 import defaultAdVertical from "../../assets/defaultAd/GO8 Default-Vertical.gif";
 import defaultVid from "../../assets/defaultAd/GO8 Default-Video.mp4";
 import defaultAdHorizontal from "../../assets/defaultAd/GO8 Default-Horizontal.gif";
+import socket from '@/socket-config/socket';
+import AnnouncementScreen from '../Announcement/AnnouncementScreen';
 
 export default function Res4({ screenId, mutedVideo }) {
   const [bottomAds, setBottomAds] = useState([]);
@@ -12,7 +14,33 @@ export default function Res4({ screenId, mutedVideo }) {
   const [showSideAds, setShowSideAds] = useState(true);
   const [videoAd, setVideoAd] = useState(null);
   const [videoSlot, setVideoSlot] = useState("Middle");
+   const [currentAnnouncement, setCurrentAnnouncement] = useState(null);
 
+
+  useEffect(() => {
+    socket.on(`announcementToScreen-${screenId}`, (newAnnouncement) => {
+      setCurrentAnnouncement(newAnnouncement);
+    });
+    return () => {
+      socket.off(`announcementToScreen-${screenId}`);
+    };
+  }, [screenId]);
+
+  useEffect(() => {
+    if (currentAnnouncement) {
+      const timer = setTimeout(async () => {
+        try {
+          await axiosInstance.patch(`/api/announcements/${currentAnnouncement.id}/deactivate`);
+        } catch (error) {
+          console.error("Error deactivating announcement:", error);
+        }
+        setCurrentAnnouncement(null);
+      }, currentAnnouncement.duration * 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [currentAnnouncement]);
+
+  
   useEffect(() => {
     const fetchAds = async () => {
       try {
@@ -93,6 +121,11 @@ export default function Res4({ screenId, mutedVideo }) {
     };
   }, [bottomAds, sideAds]);
 
+
+  if (currentAnnouncement?.announcementType === "Screen Takeover") {
+    return <AnnouncementScreen announcement={currentAnnouncement} onComplete={() => setCurrentAnnouncement(null)} />;
+  }
+
   return (
     <div className="w-screen h-screen flex bg-black">
       {/* Main Content */}
@@ -160,6 +193,11 @@ export default function Res4({ screenId, mutedVideo }) {
             </div>
           )}
         </motion.div>
+      )}
+        {currentAnnouncement?.announcementType === "Marquee" && (
+        <div className="absolute bottom-0 w-full">
+          <AnnouncementScreen announcement={currentAnnouncement} onComplete={() => setCurrentAnnouncement(null)} />
+        </div>
       )}
     </div>
   );

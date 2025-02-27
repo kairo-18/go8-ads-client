@@ -65,6 +65,12 @@ const TimeSlotModal = ({ isOpen, onClose, onSave, selectedDate, setSelectedDate,
                     const bottomAd = ads.find(ad => ad.slot === "Bottom" && adFormattedDate === formattedDate && adSlot === slot);
                     return sideAd && bottomAd; // Only disable if both slots are occupied
                 }
+                else if (layoutType === "Res4") {
+                    const sideAd = ads.find(ad => ad.slot === "Side" && adFormattedDate === formattedDate && adSlot === slot);
+                    const bottomAd = ads.find(ad => ad.slot === "Bottom" && adFormattedDate === formattedDate && adSlot === slot);
+                    const middleAd = ads.find(ad => ad.slot === "Middle" && adFormattedDate === formattedDate && adSlot === slot);
+                    return sideAd && bottomAd && middleAd; // Only disable if both slots are occupied
+                }
                 // For Res1, disable if any ad is present
                 else {
                     return true;
