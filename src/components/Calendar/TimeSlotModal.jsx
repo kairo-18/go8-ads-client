@@ -5,9 +5,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 
-const TimeSlotModal = ({ isOpen, onClose, onSave, selectedDate, setSelectedDate, ads }) => {
+const TimeSlotModal = ({ isOpen, onClose, onSave, selectedDate, setSelectedDate, ads, selectedScreens, layoutType }) => {
     const [selectedSlots, setSelectedSlots] = useState([]);
-
+    console.log(layoutType);
     const handleDateSelect = (date) => {
         setSelectedDate(date); // Use setSelectedDate from props
         setSelectedSlots([]); // Reset slots when a new date is selected
@@ -43,10 +43,6 @@ const TimeSlotModal = ({ isOpen, onClose, onSave, selectedDate, setSelectedDate,
             const adStartDate = new Date(ad.startDate);
             const adEndDate = new Date(ad.endDate);
 
-            // Debugging: Log the parsed dates to verify they are correct
-            console.log("Ad Start Date:", adStartDate);
-            console.log("Ad End Date:", adEndDate);
-
             // Format the ad's date as "yyyy-MM-dd"
             const adFormattedDate = format(adStartDate, "yyyy-MM-dd");
 
@@ -55,12 +51,32 @@ const TimeSlotModal = ({ isOpen, onClose, onSave, selectedDate, setSelectedDate,
             const adEndTime = format(adEndDate, "HH:mm");
             const adSlot = `${adStartTime} - ${adEndTime}`;
 
-            // Debugging: Log the formatted date and slot for comparison
-            console.log("Ad Formatted Date:", adFormattedDate);
-            console.log("Ad Slot:", adSlot);
-
             // Compare the date and slot
-            return adFormattedDate === formattedDate && adSlot === slot;
+            if (adFormattedDate === formattedDate && adSlot === slot) {
+                // For Res2, check if both Upper and Lower slots are occupied
+                if (layoutType === "Res2") {
+                    const upperAd = ads.find(ad => ad.slot === "Upper" && adFormattedDate === formattedDate && adSlot === slot);
+                    const lowerAd = ads.find(ad => ad.slot === "Lower" && adFormattedDate === formattedDate && adSlot === slot);
+                    return upperAd && lowerAd; // Only disable if both slots are occupied
+                }
+                // For Res3, check if both Side and Bottom slots are occupied
+                else if (layoutType === "Res3") {
+                    const sideAd = ads.find(ad => ad.slot === "Side" && adFormattedDate === formattedDate && adSlot === slot);
+                    const bottomAd = ads.find(ad => ad.slot === "Bottom" && adFormattedDate === formattedDate && adSlot === slot);
+                    return sideAd && bottomAd; // Only disable if both slots are occupied
+                }
+                else if (layoutType === "Res4") {
+                    const sideAd = ads.find(ad => ad.slot === "Side" && adFormattedDate === formattedDate && adSlot === slot);
+                    const bottomAd = ads.find(ad => ad.slot === "Bottom" && adFormattedDate === formattedDate && adSlot === slot);
+                    const middleAd = ads.find(ad => ad.slot === "Middle" && adFormattedDate === formattedDate && adSlot === slot);
+                    return sideAd && bottomAd && middleAd; // Only disable if both slots are occupied
+                }
+                // For Res1, disable if any ad is present
+                else {
+                    return true;
+                }
+            }
+            return false;
         });
     };
 

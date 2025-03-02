@@ -2,15 +2,45 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import axiosInstance from "../../axios/axiosInstance";
 import defaultAdVertical from "../../assets/defaultAd/GO8 Default-Vertical.gif";
-import defaultVid from "../../assets/defaultAd/GO8 Default-Video.mp4"
-import defaultAdHorizontal from "../../assets/defaultAd/GO8 Default-Horizontal.gif"
+import defaultVid from "../../assets/defaultAd/GO8 Default-Video.mp4";
+import defaultAdHorizontal from "../../assets/defaultAd/GO8 Default-Horizontal.gif";
+import socket from '@/socket-config/socket';
+import AnnouncementScreen from '../Announcement/AnnouncementScreen';
 
-export default function Res4({ screenId }) {
+export default function Res4({ screenId, mutedVideo }) {
   const [bottomAds, setBottomAds] = useState([]);
   const [sideAds, setSideAds] = useState([]);
   const [showBottomAds, setShowBottomAds] = useState(true);
   const [showSideAds, setShowSideAds] = useState(true);
+  const [videoAd, setVideoAd] = useState(null);
+  const [videoSlot, setVideoSlot] = useState("Middle");
+   const [currentAnnouncement, setCurrentAnnouncement] = useState(null);
 
+
+  useEffect(() => {
+    socket.on(`announcementToScreen-${screenId}`, (newAnnouncement) => {
+      setCurrentAnnouncement(newAnnouncement);
+    });
+    return () => {
+      socket.off(`announcementToScreen-${screenId}`);
+    };
+  }, [screenId]);
+
+  useEffect(() => {
+    if (currentAnnouncement) {
+      const timer = setTimeout(async () => {
+        try {
+          await axiosInstance.patch(`/api/announcements/${currentAnnouncement.id}/deactivate`);
+        } catch (error) {
+          console.error("Error deactivating announcement:", error);
+        }
+        setCurrentAnnouncement(null);
+      }, currentAnnouncement.duration * 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [currentAnnouncement]);
+
+  
   useEffect(() => {
     const fetchAds = async () => {
       try {
@@ -21,18 +51,24 @@ export default function Res4({ screenId }) {
           const endDate = new Date(ad.endDate);
           return startDate <= currentTime && endDate >= currentTime;
         });
-        setBottomAds(filteredAds.filter(ad => ad.slot === "Bottom") || []);
-        setSideAds(filteredAds.filter(ad => ad.slot === "Side") || []);
+  
+        // Get the first ad in "Middle" slot (video)
+        const middleSlotAd = filteredAds.find(ad => ad.slot === "Middle") || null;
+        setVideoAd(middleSlotAd);
+        console.log(middleSlotAd)
+  
+        setBottomAds(filteredAds.filter(ad => ad.slot === "Bottom"));
+        setSideAds(filteredAds.filter(ad => ad.slot === "Side"));
       } catch (error) {
         console.error("Error fetching ads:", error);
       }
     };
-
+  
     fetchAds();
     const intervalId = setInterval(fetchAds, 10000);
-
     return () => clearInterval(intervalId);
   }, [screenId]);
+  
 
   useEffect(() => {
     const toggleBottomAds = () => {
@@ -63,7 +99,7 @@ export default function Res4({ screenId }) {
         }, 10000)
       );
     }
-    
+
     let sideAdIntervals = [];
     if (sideAds.length > 0) {
       sideAdIntervals = sideAds.map(ad =>
@@ -78,7 +114,6 @@ export default function Res4({ screenId }) {
         }, 10000)
       );
     }
-    
 
     return () => {
       bottomAdIntervals.forEach(clearInterval);
@@ -86,63 +121,84 @@ export default function Res4({ screenId }) {
     };
   }, [bottomAds, sideAds]);
 
-  return (
-    <div>
-      <div className="w-screen h-screen flex bg-black">
-        <div className={`w-${showSideAds ? '3/4' : 'full'} bg-white`}>
-          {/* Div for video */}
-          <div className={`h-${showBottomAds ? '3/4' : 'full'} bg-gray-500`}>
-            <video className="w-full h-full"  autoPlay loop>
-              <source src={defaultVid} type="video/mp4"/>
-              Your browser does not support the video tag.
-            </video>
-          </div>
 
-          {/* Div for bottom ads */}
-          {showBottomAds && (
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: showBottomAds ? 0 : '100%' }}
-              transition={{ duration: 1 }}
-              className="w-full h-1/4"
-            >
-              {bottomAds.length > 0 ? (
-                bottomAds.map(ad => (
-                  <div key={ad.id} className="w-full h-full">
-                    <img src={ad.mediaUrl} alt="ad" className="h-full w-full" />
-                  </div>
-                ))
-              ) : (
-                <div className="w-full h-full">
-                  <img src={defaultAdHorizontal} alt="default ad" className="h-full w-full" />
-                </div>
-              )}
-            </motion.div>
-          )}
+  if (currentAnnouncement?.announcementType === "Screen Takeover") {
+    return <AnnouncementScreen announcement={currentAnnouncement} onComplete={() => setCurrentAnnouncement(null)} />;
+  }
+
+  return (
+    <div className="w-screen h-screen flex bg-black">
+      {/* Main Content */}
+      <div className={`w-${showSideAds ? "3/4" : "full"} bg-white`}>
+        {/* Video Placement */}
+        <div className={`h-${showBottomAds ? '3/4' : 'full'} bg-gray-500`}>
+        {videoSlot === "Middle" && videoAd && (
+  <video className="w-full h-full" autoPlay loop muted={mutedVideo} >
+    <source src={videoAd.mediaUrl} type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+)}
+
+          
         </div>
 
-        {/* Div for side ads */}
-        {showSideAds && (
+        {/* Bottom Ads or Video */}
+        {showBottomAds && (
           <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: showSideAds ? 0 : '100%' }}
+            initial={{ y: '100%' }}
+            animate={{ y: showBottomAds ? 0 : '100%' }}
             transition={{ duration: 1 }}
-            className="w-1/4 h-full"
+            className="w-full h-1/4"
           >
-            {sideAds.length > 0 ? (
-              sideAds.map(ad => (
-                <div key={ad.id} className="w-full h-full ">
+            {videoSlot === "Bottom" ? (
+              <video className="w-full h-full" autoPlay loop muted={mutedVideo}>
+                <source src={videoAd?.mediaUrl || defaultVid} type="video/mp4" />
+              </video>
+            ) : bottomAds.length > 0 ? (
+              bottomAds.map(ad => (
+                <div key={ad.id} className="w-full h-full">
                   <img src={ad.mediaUrl} alt="ad" className="h-full w-full" />
                 </div>
               ))
             ) : (
-              <div className="w-full h-full ">
-                <img src={defaultAdVertical} alt="default ad" className="h-full w-full" />
+              <div className="w-full h-full">
+                <img src={defaultAdHorizontal} alt="default ad" className="h-full w-full" />
               </div>
             )}
           </motion.div>
         )}
       </div>
+
+      {/* Side Ads or Video */}
+      {showSideAds && (
+        <motion.div
+          initial={{ x: '100%' }}
+          animate={{ x: showSideAds ? 0 : '100%' }}
+          transition={{ duration: 1 }}
+          className="w-1/4 h-full"
+        >
+          {videoSlot === "Side" ? (
+            <video className="w-full h-full" autoPlay loop muted={mutedVideo}>
+              <source src={videoAd?.mediaUrl || defaultVid} type="video/mp4" />
+            </video>
+          ) : sideAds.length > 0 ? (
+            sideAds.map(ad => (
+              <div key={ad.id} className="w-full h-full">
+                <img src={ad.mediaUrl} alt="ad" className="h-full w-full" />
+              </div>
+            ))
+          ) : (
+            <div className="w-full h-full">
+              <img src={defaultAdVertical} alt="default ad" className="h-full w-full" />
+            </div>
+          )}
+        </motion.div>
+      )}
+        {currentAnnouncement?.announcementType === "Marquee" && (
+        <div className="absolute bottom-0 w-full">
+          <AnnouncementScreen announcement={currentAnnouncement} onComplete={() => setCurrentAnnouncement(null)} />
+        </div>
+      )}
     </div>
   );
 }

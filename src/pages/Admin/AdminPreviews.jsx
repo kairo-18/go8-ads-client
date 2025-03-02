@@ -70,7 +70,8 @@ function AdminPreviews() {
                         <ScreenPreview screenRefreshTrigger={screenRefreshTrigger}
                         isDeleting={isDeleting}
                         selectedScreens={selectedScreens}
-                        setSelectedScreens={setSelectedScreens} />
+                        setSelectedScreens={setSelectedScreens} mutedVideo={true}
+                         />
                     </div>
                 </div>
             </div>
