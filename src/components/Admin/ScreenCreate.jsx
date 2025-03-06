@@ -13,29 +13,35 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import axiosInstance from '../../axios/axiosInstance';
-import Resolution1 from "../../assets/Resolutions/Res1.png"
-import Resolution2 from "../../assets/Resolutions/Res2.png"
-import Resolution3 from "../../assets/Resolutions/Res3.png"
-import Resolution4 from "../../assets/Resolutions/Res4.png"
+import Resolution1 from "../../assets/Resolutions/Res1.png";
+import Resolution2 from "../../assets/Resolutions/Res2.png";
+import Resolution3 from "../../assets/Resolutions/Res3.png";
+import Resolution4 from "../../assets/Resolutions/Res4.png";
 
 const ScreenCreate = ({ onScreenCreated }) => {
     const [formData, setFormData] = useState({
         name: '',
         routeName: '',
         layoutType: '',
-        userId: '', // Add userId to formData
+        userId: '',
     });
 
     const [isOpen, setIsOpen] = useState(false);
-    const [users, setUsers] = useState([]); // State to store users
+    const [users, setUsers] = useState([]);
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 const response = await axiosInstance.get('/api/users/unassigned');
-                setUsers(response.data);
+                if (Array.isArray(response.data)) {
+                    setUsers(response.data);
+                } else {
+                    console.error('Unexpected response format:', response.data);
+                    setUsers([]);
+                }
             } catch (error) {
                 console.error('Error fetching users:', error);
+                setUsers([]);
             }
         };
         fetchUsers();
@@ -64,9 +70,7 @@ const ScreenCreate = ({ onScreenCreated }) => {
 
             alert('Screen created successfully!');
             setFormData({ name: '', routeName: '', layoutType: '', userId: '' });
-            setIsOpen(false); // Close modal
-
-            // Call the refresh function
+            setIsOpen(false);
             onScreenCreated();
         } catch (error) {
             console.error('Error creating screen:', error);
@@ -98,76 +102,59 @@ const ScreenCreate = ({ onScreenCreated }) => {
                         <Input id="routeName" name="routeName" value={formData.routeName} onChange={handleChange} />
                     </div>
                     <div>
-                    <Select
-                        id="layoutType"
-                        name="layoutType"
-                        value={formData.layoutType}
-                        onValueChange={(value) => setFormData({ ...formData, layoutType: value })}
-                    >
-                        {/* Select Trigger: Shows only text, but image appears on hover */}
-                        <SelectTrigger className="relative group">
-                            <SelectValue placeholder="Select a layout type">
-                                {formData.layoutType || "Select a layout type"}
-                            </SelectValue>
-                            {formData.layoutType && (
-                                <img 
-                                    src={
-                                        formData.layoutType === "Res1" ? Resolution1 :
-                                        formData.layoutType === "Res2" ? Resolution2 :
-                                        formData.layoutType === "Res3" ? Resolution3 :
-                                        Resolution4
-                                    } 
-                                    alt={formData.layoutType} 
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 w-24 h-16 rounded-lg border shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                />
-                            )}
-                        </SelectTrigger>
-
-                        {/* Dropdown: Always show both text & images */}
-                        <SelectContent className="bg-white w-72">
-                        <SelectItem value="Res1">
-                            <div className="flex items-center space-x-3 p-3">
-                                <img src={Resolution1} alt="Res1" className="w-24 h-16 rounded-lg border shadow-md" />
-                                <div>
-                                    <span className="text-md font-medium">Res1</span>
-                                    <p className="text-sm text-gray-500">1 vertical ad slot</p>
-                                </div>
-                            </div>
-                        </SelectItem>
-                        <SelectItem value="Res2">
-                            <div className="flex items-center space-x-3 p-3">
-                                <img src={Resolution2} alt="Res2" className="w-24 h-16 rounded-lg border shadow-md" />
-                                <div>
-                                    <span className="text-md font-medium">Res2</span>
-                                    <p className="text-sm text-gray-500">2 square ad slots</p>
-                                </div>
-                            </div>
-                        </SelectItem>
-                        <SelectItem value="Res3">
-                            <div className="flex items-center space-x-3 p-3">
-                                <img src={Resolution3} alt="Res3" className="w-24 h-16 rounded-lg border shadow-md" />
-                                <div>
-                                    <span className="text-md font-medium">Res3</span>
-                                    <p className="text-sm text-gray-500">1 horizontal</p>
-                                    <p className="text-sm text-gray-500">1 vertical ad slot</p>
-                                </div>
-                            </div>
-                        </SelectItem>
-                        <SelectItem value="Res4">
-                            <div className="flex items-center space-x-3 p-3">
-                                <img src={Resolution3} alt="Res4" className="w-24 h-16 rounded-lg border shadow-md" />
-                                <div>
-                                    <span className="text-md font-medium">Res4</span>
-                                    <p className="text-sm text-gray-500">1 horizontal</p>
-                                    <p className="text-sm text-gray-500">1 vertical ad slot</p>
-                                </div>
-                            </div>
-                        </SelectItem>
-                    </SelectContent>
-                    </Select>
-
-
-
+                        <Select
+                            id="layoutType"
+                            name="layoutType"
+                            value={formData.layoutType}
+                            onValueChange={(value) => setFormData({ ...formData, layoutType: value })}
+                        >
+                            <SelectTrigger className="relative group">
+                                <SelectValue placeholder="Select a layout type">
+                                    {formData.layoutType || "Select a layout type"}
+                                </SelectValue>
+                                {formData.layoutType && (
+                                    <img
+                                        src={
+                                            formData.layoutType === "Res1" ? Resolution1 :
+                                            formData.layoutType === "Res2" ? Resolution2 :
+                                            formData.layoutType === "Res3" ? Resolution3 :
+                                            Resolution4
+                                        }
+                                        alt={formData.layoutType}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 w-24 h-16 rounded-lg border shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                    />
+                                )}
+                            </SelectTrigger>
+                            <SelectContent className="bg-white w-72">
+                                <SelectItem value="Res1">
+                                    <div className="flex items-center space-x-3 p-3">
+                                        <img src={Resolution1} alt="Res1" className="w-24 h-16 rounded-lg border shadow-md" />
+                                        <div>
+                                            <span className="text-md font-medium">Res1</span>
+                                            <p className="text-sm text-gray-500">1 vertical ad slot</p>
+                                        </div>
+                                    </div>
+                                </SelectItem>
+                                <SelectItem value="Res2">
+                                    <div className="flex items-center space-x-3 p-3">
+                                        <img src={Resolution2} alt="Res2" className="w-24 h-16 rounded-lg border shadow-md" />
+                                        <div>
+                                            <span className="text-md font-medium">Res2</span>
+                                            <p className="text-sm text-gray-500">2 square ad slots</p>
+                                        </div>
+                                    </div>
+                                </SelectItem>
+                                <SelectItem value="Res3">
+                                    <div className="flex items-center space-x-3 p-3">
+                                        <img src={Resolution3} alt="Res3" className="w-24 h-16 rounded-lg border shadow-md" />
+                                        <div>
+                                            <span className="text-md font-medium">Res3</span>
+                                            <p className="text-sm text-gray-500">1 horizontal, 1 vertical ad slot</p>
+                                        </div>
+                                    </div>
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div>
                         <Label htmlFor="userId">Assign User</Label>
@@ -181,13 +168,9 @@ const ScreenCreate = ({ onScreenCreated }) => {
                                 <SelectValue placeholder="Select a user" />
                             </SelectTrigger>
                             <SelectContent>
-                                {users
-                                    .filter((user) => user.role !== 'admin')
-                                    .map((user) => (
-                                        <SelectItem key={user.id} value={user.id}>
-                                            {user.username}
-                                        </SelectItem>
-                                    ))}
+                                {Array.isArray(users) && users.filter(user => user.role !== 'admin').map(user => (
+                                    <SelectItem key={user.id} value={user.id}>{user.username}</SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>
