@@ -117,44 +117,54 @@ function CreateAd() {
         }
 
         try {
-            await Promise.all(
-                selectedTimeSlots.map((timeSlot) => {
-                    const [startTime, endTime] = timeSlot.slot.split(" - ");
-                    const startDate = new Date(`${timeSlot.date}T${startTime}:00`);
-                    const endDate = new Date(`${timeSlot.date}T${endTime}:00`);
+            // Construct an array of ad objects
+            const adsToCreate = selectedTimeSlots.map((timeSlot) => {
+                const [startTime, endTime] = timeSlot.slot.split(" - ");
+                const startDate = new Date(`${timeSlot.date}T${startTime}:00`);
+                const endDate = new Date(`${timeSlot.date}T${endTime}:00`);
 
-                    // Check if the slot is already taken
-                    const isSlotTaken = ads.some(ad => {
-                        const adStartDate = new Date(ad.startDate);
-                        const adEndDate = new Date(ad.endDate);
-                        const adFormattedDate = format(adStartDate, "yyyy-MM-dd");
-                        const adSlot = `${format(adStartDate, "HH:mm")} - ${format(adEndDate, "HH:mm")}`;
+                // Check if the slot is already taken
+                const isSlotTaken = ads.some(ad => {
+                    const adStartDate = new Date(ad.startDate);
+                    const adEndDate = new Date(ad.endDate);
+                    const adFormattedDate = format(adStartDate, "yyyy-MM-dd");
+                    const adSlot = `${format(adStartDate, "HH:mm")} - ${format(adEndDate, "HH:mm")}`;
 
-                        return (
-                            adFormattedDate === timeSlot.date &&
-                            adSlot === timeSlot.slot &&
-                            ad.slot === adDetails.slot
-                        );
-                    });
+                    return (
+                        adFormattedDate === timeSlot.date &&
+                        adSlot === timeSlot.slot &&
+                        ad.slot === adDetails.slot
+                    );
+                });
 
-                    if (isSlotTaken) {
-                        // Show an alert instead of throwing an error
-                        alert(`The ${adDetails.slot} slot is already taken for ${timeSlot.slot}. Please choose another slot.`);
-                        return; // Exit the function early
-                    }
+                if (isSlotTaken) {
+                    // Show an alert instead of throwing an error
+                    alert(`The ${adDetails.slot} slot is already taken for ${timeSlot.slot}. Please choose another slot.`);
+                    return null; // Skip this time slot
+                }
 
-                    console.log(adDetails, startDate, endDate);
+                const adObject = {
+                    ...adDetails,
+                    startDate,
+                    endDate,
+                };
 
-                    return axiosInstance.post(`/api/screens/${selectedScreens[0]}/ads`, {
-                        ...adDetails,
-                        startDate,
-                        endDate,
-                    });
-                })
-            );
-        
+                console.log("Generated ad object:", adObject); // Log each ad object
+                return adObject;
+            }).filter(ad => ad !== null); // Filter out any null values (skipped slots)
+
+            if (adsToCreate.length === 0) {
+                return alert("No valid time slots to create ads.");
+            }
+
+            console.log("Ads to be created:", adsToCreate); // Log the final array of ad objects
+
+            // Send the array of ad objects in a single POST request
+            const response = await axiosInstance.post(`/api/screens/${selectedScreens[0]}/ads`, adsToCreate);
+
+            console.log("Backend response:", response.data); // Log the backend response
+
             navigate("/admin/ad-setting");
-          
         } catch (error) {
             console.error("Error creating ad:", error);
         }
@@ -278,7 +288,7 @@ function CreateAd() {
                                 <CardTitle>Start Advertising</CardTitle>
                                 <Button
                                     onClick={handleCreateAd}
-                                    
+
                                     className=" w-[100px] bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
                                 >
                                     Create Ad
@@ -352,7 +362,21 @@ function CreateAd() {
                                                 <Label htmlFor="file" className="block mb-2 font-medium">
                                                     Select Time Slots
                                                 </Label>
-                                                <Button onClick={toggleModal}> Selection Screen </Button>
+                                                <div className="relative mb-10">
+                                                    <Button
+                                                        onClick={toggleModal}
+                                                        disabled={selectedScreens.length === 0 || !adDetails.slot}
+                                                    >
+                                                        Select Time Slots
+                                                    </Button>
+                                                    {(selectedScreens.length === 0 || !adDetails.slot) && (
+                                                        <div className="absolute top-full mt-2 text-sm text-red-600">
+                                                            {selectedScreens.length === 0 && !adDetails.slot && "Please select a screen and a slot."}
+                                                            {selectedScreens.length === 0 && adDetails.slot && "Please select a screen."}
+                                                            {selectedScreens.length > 0 && !adDetails.slot && "Please select a slot."}
+                                                        </div>
+                                                    )}
+                                                </div>
                                                 <TimeSlotModal
                                                     isOpen={isModalOpen}
                                                     onClose={toggleModal}
@@ -368,7 +392,7 @@ function CreateAd() {
                                                 <Label htmlFor="file" className="block mb-2 font-medium">
                                                     Upload File
                                                 </Label>
-                                                <div className="relative w-64">
+                                                <div className="relative w-full">
                                                     <Input
                                                         id="file"
                                                         type="file"

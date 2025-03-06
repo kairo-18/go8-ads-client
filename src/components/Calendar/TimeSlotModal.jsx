@@ -22,11 +22,9 @@ const TimeSlotModal = ({ isOpen, onClose, onSave, selectedDate, setSelectedDate,
     const generateTimeSlots = () => {
         const slots = [];
         for (let hour = 0; hour < 24; hour++) {
-            for (let minute = 0; minute < 60; minute += 30) {
-                const startTime = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-                const endTime = `${String(hour + (minute + 30 === 60 ? 1 : 0)).padStart(2, '0')}:${String((minute + 30) % 60).padStart(2, '0')}`;
-                slots.push(`${startTime} - ${endTime}`);
-            }
+            const startTime = `${String(hour).padStart(2, '0')}:00`;
+            const endTime = `${String(hour + 1).padStart(2, '0')}:00`;
+            slots.push(`${startTime} - ${endTime}`);
         }
         return slots;
     };
@@ -34,8 +32,32 @@ const TimeSlotModal = ({ isOpen, onClose, onSave, selectedDate, setSelectedDate,
     const isSlotOccupied = (slot) => {
         if (!selectedDate) return false;
 
+        // Get the current date and time
+        const now = new Date();
+        const currentDate = format(now, "yyyy-MM-dd");
+        const currentHour = now.getHours();
+
         // Format the selected date as "yyyy-MM-dd"
         const formattedDate = format(selectedDate, "yyyy-MM-dd");
+
+        // Check if the selected date is in the past
+        const isPastDate = formattedDate < currentDate;
+
+        // If the selected date is in the past, disable all slots
+        if (isPastDate) {
+            return true;
+        }
+
+        // Check if the selected date is today
+        const isToday = formattedDate === currentDate;
+
+        // Extract the start time from the slot
+        const startTime = parseInt(slot.split(":")[0], 10);
+
+        // If the selected date is today and the slot is in the past, disable it
+        if (isToday && startTime < currentHour) {
+            return true;
+        }
 
         // Check if any ad matches the selected date and slot
         return ads.some(ad => {
@@ -47,8 +69,11 @@ const TimeSlotModal = ({ isOpen, onClose, onSave, selectedDate, setSelectedDate,
             const adFormattedDate = format(adStartDate, "yyyy-MM-dd");
 
             // Format the ad's time slot as "HH:mm - HH:mm"
-            const adStartTime = format(adStartDate, "HH:mm");
-            const adEndTime = format(adEndDate, "HH:mm");
+            const adStartTime = format(adStartDate, "HH:00");
+            let adEndTime = format(adEndDate, "HH:00");
+            if (adEndTime === "00:00") {
+                adEndTime = "24:00";
+            }
             const adSlot = `${adStartTime} - ${adEndTime}`;
 
             // Compare the date and slot
