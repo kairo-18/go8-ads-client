@@ -72,7 +72,7 @@ export default function UsersPage() {
     <div className="p-6 bg-white min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
-        <Button 
+        <Button
           className="bg-blue-600 hover:bg-blue-700 text-white"
           onClick={() => { setOpen(true); setEditMode(false); }}
         >
@@ -96,17 +96,17 @@ export default function UsersPage() {
                 <TableCell>{user.id}</TableCell>
                 <TableCell>{user.username}</TableCell>
                 <TableCell>{user.role}</TableCell>
-                <TableCell className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    className="border-blue-500 text-blue-600 hover:bg-blue-100"
+                <TableCell className="flex">
+                  <Button
+                    variant="outline"
+                    className="border-blue-500 text-blue-600 hover:bg-blue-100 mr-2"
                     onClick={() => { setSelectedUser(user); setEditMode(true); setOpen(true); }}
                   >
                     Edit
                   </Button>
-                  <Button 
-                    variant="destructive" 
-                    className="bg-red-600 text-white hover:bg-red-700"
+                  <Button
+                    variant="destructive"
+                    className="bg-red-600 text-white hover:bg-red-700 ml-2"
                     onClick={() => handleDeleteUser(user.id)}
                   >
                     Delete
@@ -128,8 +128,8 @@ export default function UsersPage() {
             <Input
               placeholder="Username"
               value={editMode ? selectedUser?.username : newUser.username}
-              onChange={(e) => editMode 
-                ? setSelectedUser({ ...selectedUser, username: e.target.value }) 
+              onChange={(e) => editMode
+                ? setSelectedUser({ ...selectedUser, username: e.target.value })
                 : setNewUser({ ...newUser, username: e.target.value })}
             />
             {!editMode && (
@@ -142,8 +142,8 @@ export default function UsersPage() {
             )}
            <Select
           value={editMode ? selectedUser?.role : newUser.role}
-          onValueChange={(value) => editMode 
-            ? setSelectedUser({ ...selectedUser, role: value }) 
+          onValueChange={(value) => editMode
+            ? setSelectedUser({ ...selectedUser, role: value })
             : setNewUser({ ...newUser, role: value })}
         >
           <SelectTrigger className="w-full border border-gray-300 rounded-md bg-white text-gray-700 focus:ring focus:ring-blue-200">
@@ -154,7 +154,7 @@ export default function UsersPage() {
             <SelectItem value="tv1">TV</SelectItem>
           </SelectContent>
         </Select>
-            <Button 
+            <Button
               className="w-full bg-green-600 hover:bg-green-700 text-white mt-2"
               onClick={editMode ? handleEditUser : handleCreateUser}
             >

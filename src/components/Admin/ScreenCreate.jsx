@@ -121,11 +121,11 @@ const ScreenCreate = ({ onScreenCreated }) => {
                                             Resolution4
                                         }
                                         alt={formData.layoutType}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 w-24 h-16 rounded-lg border shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 w-1/2 rounded-lg border shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                     />
                                 )}
                             </SelectTrigger>
-                            <SelectContent className="bg-white w-72">
+                            <SelectContent className="bg-white w-full">
                                 <SelectItem value="Res1">
                                     <div className="flex items-center space-x-3 p-3">
                                         <img src={Resolution1} alt="Res1" className="w-24 h-16 rounded-lg border shadow-md" />
@@ -167,7 +167,7 @@ const ScreenCreate = ({ onScreenCreated }) => {
                             <SelectTrigger>
                                 <SelectValue placeholder="Select a user" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-white">
                                 {Array.isArray(users) && users.filter(user => user.role !== 'admin').map(user => (
                                     <SelectItem key={user.id} value={user.id}>{user.username}</SelectItem>
                                 ))}
