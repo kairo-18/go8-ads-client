@@ -19,10 +19,34 @@ import Res3 from "./components/Res3/Res3";
 import Res4 from "./components/Res4/Res4";
 
 // PrivateRoute component to protect admin routes
+
+
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/admin" />;
+
+  if (!token) {
+    return <Navigate to="/" />;
+  }
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT
+    const isExpired = payload.exp * 1000 < Date.now(); // Check expiration
+
+    if (isExpired) {
+      localStorage.removeItem("token"); // Remove expired token
+      return <Navigate to="/" />;
+    }
+  } catch (error) {
+    console.error("Invalid token:", error);
+    localStorage.removeItem("token");
+    return <Navigate to="/" />;
+  }
+
+  return children;
 };
+
+
+
 
 function App() {
   const [screens, setScreens] = useState([]);
