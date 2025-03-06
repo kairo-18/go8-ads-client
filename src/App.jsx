@@ -58,7 +58,7 @@ function App() {
         ))}
 
         {/* Public Route */}
-        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/" element={<AdminLogin />} />
 
         {/* Admin Routes Wrapped in AdminLayout */}
         <Route

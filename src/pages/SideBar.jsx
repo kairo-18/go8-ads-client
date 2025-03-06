@@ -66,7 +66,7 @@ function SideBar({ collapsed, setCollapsed }) {
                 ${collapsed ? "justify-center" : "gap-2"}`}
                 onClick={() => {
                     logout();
-                    navigate("/admin");
+                    navigate("/");
                 }}
             >
                 <img src={logoutIcon} alt="Logout" className="w-5 h-5" />
