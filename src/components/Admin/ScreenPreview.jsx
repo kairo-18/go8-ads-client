@@ -40,7 +40,7 @@ function ScreenPreview({ screenRefreshTrigger, isDeleting, selectedScreens, setS
     };
 
     const calculateActiveAds = (screen) => {
-        const totalAds = screen.layoutType === "Res1" ? 12 : 24;
+        const totalAds = screen.layoutType === "Res1" ? 24 :  screen.layoutType === "Res4" ? 72 : 48 ;
         let activeAds = 0;
         const today = new Date();
         const todayStart = new Date(today.setHours(0, 0, 0, 0));
@@ -100,9 +100,18 @@ function ScreenPreview({ screenRefreshTrigger, isDeleting, selectedScreens, setS
                             ) : null
                             }
                         </div>
-                        <div className="flex justify-between items-center w-full px-2 -mt-5">
-                            {calculateActiveAds(screen)}
-                            <button className="text-blue-500 underline" onClick={() => navigate(`/${screen.routeName}`)}>
+                        <div className="flex justify-between items-center w-full px-2 -mt-5 overflow-hidden">
+                            {/* Status Message */}
+                            <div className="flex-1 min-w-0 pr-2">
+                                {calculateActiveAds(screen)}
+                            </div>
+
+                            {/* Screen Name */}
+                            <button
+                                className="text-blue-500 underline truncate flex-shrink-0 max-w-[50%]"
+                                onClick={() => navigate(`/${screen.routeName}`)}
+                                title={screen.name} // Show full name on hover
+                            >
                                 {screen.name}
                             </button>
                         </div>
