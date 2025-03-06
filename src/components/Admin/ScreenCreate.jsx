@@ -152,6 +152,14 @@ const ScreenCreate = ({ onScreenCreated }) => {
                                             <p className="text-sm text-gray-500">1 horizontal, 1 vertical ad slot</p>
                                         </div>
                                     </div>
+                                </SelectItem><SelectItem value="Res4">
+                                    <div className="flex items-center space-x-3 p-3">
+                                        <img src={Resolution4} alt="Res3" className="w-24 h-16 rounded-lg border shadow-md" />
+                                        <div>
+                                            <span className="text-md font-medium">Res4</span>
+                                            <p className="text-sm text-gray-500">1 horizontal, 1 vertical, 1 middle ad slot</p>
+                                        </div>
+                                    </div>
                                 </SelectItem>
                             </SelectContent>
                         </Select>
