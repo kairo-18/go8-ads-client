@@ -107,8 +107,8 @@ function Res4({ screenId, mutedVideo }) {
     } else {
       // At least one valid ad
       setIsAdsVisible(true);
-      setIsSideAdVisible(!!sideAd);
-      setIsBottomAdVisible(!!bottomAd);
+      setIsSideAdVisible(!!sideAd || !!videoAd || !!bottomAd);
+      setIsBottomAdVisible(!!bottomAd || !!videoAd || !!sideAd);
       setIsVideoAdVisible(!!videoAd);
 
       const sideDuration = sideAd ? sideAd.duration * 1000 : 0;
@@ -180,9 +180,9 @@ function Res4({ screenId, mutedVideo }) {
       {/* Main Content */}
       <div className={`flex flex-col ${isAdsVisible ? "w-3/4" : "w-full"} h-full`}>
         {/* Video Placement */}
-        <div className={`flex-1 flex-col ${isAdsVisible ? "h-3/4" : "h-full"} w-full`}>
+        <div className={`flex-1 flex-col ${isAdsVisible ? "h-3/4" : "h-full"} w-full bg-black`}>
           {isVideoAdVisible && isValidVideoAd && !isFlightBoardVisible && (
-            <video className="w-full h-full" autoPlay loop muted={mutedVideo}>
+            <video className="w-full h-full" autoPlay loop muted>
               <source src={currentVideoAd.mediaUrl} type="video/mp4" />
               Your browser does not support the video tag.
             </video>

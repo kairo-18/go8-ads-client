@@ -102,7 +102,7 @@ function ScreenPreview({ screenRefreshTrigger, isDeleting, selectedScreens, setS
                         </div>
                         <div className="flex justify-between items-center w-full px-2 -mt-5 overflow-hidden">
                             {/* Status Message */}
-                            <div className="flex-1 min-w-0 pr-2">
+                            <div className="flex-1 min-w-0 pr-2 truncate">
                                 {calculateActiveAds(screen)}
                             </div>
 
